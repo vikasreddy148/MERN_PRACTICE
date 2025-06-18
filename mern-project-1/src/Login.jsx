@@ -14,12 +14,12 @@ const Login = () => {
               name="txtUser"
               id="txtUser"
               className="form-control"
-              
             />
           </dd>
         </dl>
       </form>
     </div>
+    
   );
 };
 
