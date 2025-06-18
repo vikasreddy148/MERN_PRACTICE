@@ -1,6 +1,6 @@
 const Login = () => {
   return (
-    <div className="container">
+    <div className="container-fluid text-center">
       <form action="">
         <dl>
           <dt>
