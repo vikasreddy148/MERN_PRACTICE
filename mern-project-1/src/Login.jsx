@@ -1,6 +1,6 @@
 import { useState } from "react";
-
-const Login = ({updateUserDetails}) => {
+import axios from "axios";
+const Login = ({ updateUserDetails }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null);
@@ -27,22 +27,36 @@ const Login = ({updateUserDetails}) => {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      if (formData.username === "admin" && formData.password === "admin") {
-        updateUserDetails({
-          name : "John Cena",
-          email : "john@gmail.com"
-        });
-      } else {
-        setMessage("Invalid Credentials");
+      //data to be sent to the server
+      const body = {
+        username: formData.username,
+        password: formData.password
+      };
+      const config = {
+        //Tells axios to include cookie in the request
+        withCredentials: true,
+      };
+      try {
+        const response = await axios.post(
+          "http://localhost:5001/auth/login",
+          body,
+          config
+        );
+        updateUserDetails(response.data.user);
+        
+      } catch (error) {
+        console.log(error);
+        setErrors({ message: "Something went wrong, please try again later" });
       }
     }
   };
   return (
     <div className="container-fluid text-center p-3">
       {message && message}
+      {errors.message && (errors.message)}
       <h1>Log in page</h1>
       <form action="" onSubmit={handleSubmit}>
         <div className="mt-3 p-1">
@@ -63,7 +77,9 @@ const Login = ({updateUserDetails}) => {
             value={formData.password}
             onChange={handleChange}
           />
-          <span className="text-danger">{errors.password && errors.password} </span>
+          <span className="text-danger">
+            {errors.password && errors.password}{" "}
+          </span>
         </div>
         <div className="mt-3">
           <button className="btn btn-primary">Submit</button>
