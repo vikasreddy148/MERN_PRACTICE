@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+
 const Login = ({ updateUserDetails }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
@@ -33,7 +35,7 @@ const Login = ({ updateUserDetails }) => {
       //data to be sent to the server
       const body = {
         username: formData.username,
-        password: formData.password
+        password: formData.password,
       };
       const config = {
         //Tells axios to include cookie in the request
@@ -46,17 +48,39 @@ const Login = ({ updateUserDetails }) => {
           config
         );
         updateUserDetails(response.data.user);
-        
       } catch (error) {
         console.log(error);
         setErrors({ message: "Something went wrong, please try again later" });
       }
     }
   };
+  const handleGoogleSuccess = async (authResponse) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5001/auth/google-auth",
+        {
+          idToken: authResponse.credential,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      updateUserDetails(response.data.user);
+    } catch (error) {
+      console.log(error);
+      setErrors({ message: "Error processing google auth, please try again" });
+    }
+  };
+  const handleGoogleError = async (error) => {
+    console.log(error);
+    setErrors({
+      message: "Error in google authorization flow, please try again",
+    });
+  };
   return (
     <div className="container-fluid text-center p-3">
       {message && message}
-      {errors.message && (errors.message)}
+      {errors.message && errors.message}
       <h1>Log in page</h1>
       <form action="" onSubmit={handleSubmit}>
         <div className="mt-3 p-1">
@@ -85,6 +109,13 @@ const Login = ({ updateUserDetails }) => {
           <button className="btn btn-primary">Submit</button>
         </div>
       </form>
+      <h2>Or</h2>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleError}
+        />
+      </GoogleOAuthProvider>
     </div>
   );
 };
