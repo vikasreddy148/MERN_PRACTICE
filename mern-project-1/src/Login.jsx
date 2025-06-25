@@ -4,6 +4,7 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { Link } from "react-router-dom";
 import { serverEndpoint } from "./config";
 import { useDispatch } from "react-redux";
+import { SET_USER } from "./redux/user/actions";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -53,7 +54,7 @@ const Login = () => {
         );
         // updateUserDetails(response.data.user);
         dispatch({
-          type: "SET_USER",
+          type: SET_USER,
           payload: response.data.user,
         });
       } catch (error) {
@@ -75,7 +76,7 @@ const Login = () => {
       );
       // updateUserDetails(response.data.user);
       dispatch({
-        type: "SET_USER",
+        type: SET_USER,
         payload: response.data.user,
       });
     } catch (error) {

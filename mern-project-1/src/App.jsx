@@ -10,6 +10,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { serverEndpoint } from "./config";
 import { useDispatch, useSelector } from "react-redux";
+import { SET_USER } from "./redux/user/actions";
 
 function App() {
   // const [userDetails, setUserDetails] = useState(null);
@@ -28,7 +29,7 @@ function App() {
       );
       // updateUserDetails(response.data.user);
       dispatch({
-        type: "SET_USER",
+        type: SET_USER,
         payload: response.data.user,
       });
     } catch (error) {
