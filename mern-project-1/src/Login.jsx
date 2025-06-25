@@ -3,8 +3,10 @@ import axios from "axios";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { Link } from "react-router-dom";
 import { serverEndpoint } from "./config";
+import { useDispatch } from "react-redux";
 
-const Login = ({ updateUserDetails }) => {
+const Login = () => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null);
@@ -49,7 +51,11 @@ const Login = ({ updateUserDetails }) => {
           body,
           config
         );
-        updateUserDetails(response.data.user);
+        // updateUserDetails(response.data.user);
+        dispatch({
+          type: "SET_USER",
+          payload: response.data.user,
+        });
       } catch (error) {
         console.log(error);
         setErrors({ message: "Something went wrong, please try again later" });
@@ -67,7 +73,11 @@ const Login = ({ updateUserDetails }) => {
           withCredentials: true,
         }
       );
-      updateUserDetails(response.data.user);
+      // updateUserDetails(response.data.user);
+      dispatch({
+        type: "SET_USER",
+        payload: response.data.user,
+      });
     } catch (error) {
       console.log(error);
       setErrors({ message: "Error processing google auth, please try again" });
@@ -111,9 +121,14 @@ const Login = ({ updateUserDetails }) => {
           <button className="btn btn-primary">log in</button>
         </div>
       </form>
-      <p>Don't have an account <span><Link to = "/register">register</Link></span></p>
+      <p>
+        Don't have an account{" "}
+        <span>
+          <Link to="/register">register</Link>
+        </span>
+      </p>
       <h6 className="m-3">or</h6>
-      <div className="w-100 d-flex text-center justify-content-center" >
+      <div className="w-100 d-flex text-center justify-content-center">
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
           <GoogleLogin
             onSuccess={handleGoogleSuccess}

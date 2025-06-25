@@ -3,19 +3,19 @@ import Home from "./Home";
 import Login from "./Login";
 import AppLayout from "./layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
- import Error from "./pages/Error";
+import Error from "./pages/Error";
 import Logout from "./pages/Logout";
 import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
 import { serverEndpoint } from "./config";
+import { useDispatch, useSelector } from "react-redux";
 
 function App() {
-  const [userDetails, setUserDetails] = useState(null);
+  // const [userDetails, setUserDetails] = useState(null);
+  const dispatch = useDispatch();
+  const userDetails = useSelector((state) => state.userDetails);
   //Lifting the State Up from Log component  in to app component
-  const updateUserDetails = (updateUserDetails) => {
-    setUserDetails(updateUserDetails);
-  };
 
   const isUserLoggedIn = async () => {
     try {
@@ -26,7 +26,11 @@ function App() {
           withCredentials: true,
         }
       );
-      updateUserDetails(response.data.user);
+      // updateUserDetails(response.data.user);
+      dispatch({
+        type: "SET_USER",
+        payload: response.data.user,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -57,7 +61,7 @@ function App() {
                 <Navigate to={"/dashboard"} />
               ) : (
                 <AppLayout>
-                  <Login updateUserDetails={updateUserDetails} />
+                  <Login />
                 </AppLayout>
               )
             }
@@ -68,13 +72,7 @@ function App() {
           />
           <Route
             path="/logout"
-            element={
-              userDetails ? (
-                <Logout updateUserDetails={updateUserDetails} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={userDetails ? <Logout /> : <Navigate to="/login" />}
           />
           <Route
             path="/error"
