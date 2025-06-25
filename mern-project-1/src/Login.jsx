@@ -91,51 +91,97 @@ const Login = () => {
     });
   };
   return (
-    <div className="container-fluid text-center p-3">
-      {message && message}
-      {errors.message && errors.message}
-      <h1>Log in page</h1>
-      <form action="" onSubmit={handleSubmit}>
-        <div className="mt-3 p-1">
-          <label htmlFor="">UserName:</label>
-          <input
-            type="text"
-            name="username"
-            onChange={handleChange}
-            value={formData.username}
-          />
-          {errors.username && errors.username}
+    <div className="container-fluid py-4 px-3 ">
+      {/* Alert Messages */}
+      {message && (
+        <div className="alert alert-success text-center" role="alert">
+          {message}
         </div>
-        <div className="mt-3">
-          <label htmlFor="">Password: </label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          <span className="text-danger">
-            {errors.password && errors.password}{" "}
-          </span>
+      )}
+      {errors.message && (
+        <div className="alert alert-danger text-center" role="alert">
+          {errors.message}
         </div>
-        <div className="mt-3">
-          <button className="btn btn-primary">log in</button>
+      )}
+
+      {/* Card Wrapper */}
+      <div className="d-flex justify-content-center">
+        <div
+          className="card shadow-sm "
+          style={{ maxWidth: "400px", width: "100%" }}
+        >
+          <div className="card-body">
+            <h2 className="text-center mb-4">Log In</h2>
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label className="form-label">Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  onChange={handleChange}
+                  value={formData.username}
+                  className="form-control"
+                  placeholder="Enter your username"
+                />
+                {errors.username && (
+                  <small className="text-danger">{errors.username}</small>
+                )}
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="Enter your password"
+                />
+                {errors.password && (
+                  <small className="text-danger">{errors.password}</small>
+                )}
+              </div>
+
+              <div className="d-grid">
+                <button type="submit" className="btn btn-primary">
+                  Log In
+                </button>
+              </div>
+            </form>
+
+            {/* Register Prompt */}
+            <div className="text-center mt-3">
+              <p className="mb-1">Don't have an account?</p>
+              <Link
+                to="/register"
+                className="text-primary fw-semibold text-decoration-none"
+              >
+                Register
+              </Link>
+            </div>
+
+            {/* Divider */}
+            <div className="d-flex align-items-center my-3">
+              <hr className="flex-grow-1" />
+              <span className="mx-2 text-muted">or</span>
+              <hr className="flex-grow-1" />
+            </div>
+
+            {/* Google Login */}
+            <div className="d-flex justify-content-center">
+              <GoogleOAuthProvider
+                clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+              >
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                />
+              </GoogleOAuthProvider>
+            </div>
+          </div>
         </div>
-      </form>
-      <p>
-        Don't have an account{" "}
-        <span>
-          <Link to="/register">register</Link>
-        </span>
-      </p>
-      <h6 className="m-3">or</h6>
-      <div className="w-100 d-flex text-center justify-content-center">
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleError}
-          />
-        </GoogleOAuthProvider>
       </div>
     </div>
   );
