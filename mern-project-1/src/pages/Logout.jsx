@@ -1,13 +1,14 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { serverEndpoint } from "../config";
 
 function Logout({ updateUserDetails }) {
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
       await axios.post(
-        'http://localhost:5001/auth/logout',
+        `${serverEndpoint}/auth/logout`,
         {},
         {
           withCredentials: true,

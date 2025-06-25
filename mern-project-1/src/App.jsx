@@ -8,6 +8,7 @@ import Logout from "./pages/Logout";
 import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
+import { serverEndpoint } from "./config";
 
 function App() {
   const [userDetails, setUserDetails] = useState(null);
@@ -19,7 +20,7 @@ function App() {
   const isUserLoggedIn = async () => {
     try {
       const response = await axios.post(
-        " http://localhost:5001/auth/is-user-logged-in",
+        ` ${serverEndpoint}/auth/is-user-logged-in`,
         {},
         {
           withCredentials: true,

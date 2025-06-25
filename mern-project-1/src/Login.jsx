@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { Link } from "react-router-dom";
+import { serverEndpoint } from "./config";
 
 const Login = ({ updateUserDetails }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -43,7 +45,7 @@ const Login = ({ updateUserDetails }) => {
       };
       try {
         const response = await axios.post(
-          "http://localhost:5001/auth/login",
+          `${serverEndpoint}/auth/login`,
           body,
           config
         );
@@ -57,7 +59,7 @@ const Login = ({ updateUserDetails }) => {
   const handleGoogleSuccess = async (authResponse) => {
     try {
       const response = await axios.post(
-        "http://localhost:5001/auth/google-auth",
+        `${serverEndpoint}/auth/google-auth`,
         {
           idToken: authResponse.credential,
         },
@@ -106,16 +108,19 @@ const Login = ({ updateUserDetails }) => {
           </span>
         </div>
         <div className="mt-3">
-          <button className="btn btn-primary">Submit</button>
+          <button className="btn btn-primary">log in</button>
         </div>
       </form>
-      <h2>Or</h2>
-      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={handleGoogleError}
-        />
-      </GoogleOAuthProvider>
+      <p>Don't have an account <span><Link to = "/register">register</Link></span></p>
+      <h6 className="m-3">or</h6>
+      <div className="w-100 d-flex text-center justify-content-center" >
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+          />
+        </GoogleOAuthProvider>
+      </div>
     </div>
   );
 };

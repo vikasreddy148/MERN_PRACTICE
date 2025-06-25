@@ -36,10 +36,8 @@ function Header() {
                   Contact
                 </Link>
               </li>
-              
-             
             </ul>
-            <form className="d-flex" role="search">
+            <form className="d-flex" role="search"  onSubmit={(e) => e.preventDefault()}>
               <input
                 className="form-control me-2"
                 type="search"
