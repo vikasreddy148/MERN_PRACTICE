@@ -2,14 +2,19 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Users = require("../model/Users");
 const { OAuth2Client } = require("google-auth-library");
+const { validationResult } = require("express-validator");
 //https://www.uuidgenerator.net/
 const secret = "42e816ec-a1b2-4e95-9cdd-24f4480a648a";
 const authController = {
   login: async (request, response) => {
+    try {
+      const errors = validationResult(request);
+      if (!errors.isEmpty()) {
+        return response.status(401).json({ errors: errors.array() });
+      }
     //The Body contains user name and password because of the express.json()
     //middleware configured in the server.js
-    try {
-      const { username, password } = request.body;
+      const { username, password }= request.body;
 
       //
       const data = await Users.findOne({ email: username });
