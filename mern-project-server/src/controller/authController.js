@@ -12,9 +12,9 @@ const authController = {
       if (!errors.isEmpty()) {
         return response.status(401).json({ errors: errors.array() });
       }
-    //The Body contains user name and password because of the express.json()
-    //middleware configured in the server.js
-      const { username, password }= request.body;
+      //The Body contains user name and password because of the express.json()
+      //middleware configured in the server.js
+      const { username, password } = request.body;
 
       //
       const data = await Users.findOne({ email: username });
@@ -80,7 +80,19 @@ const authController = {
         name: name,
       });
       await user.save();
-      response.status(200).json({ message: "User Registered" });
+      const userDetails = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      };
+      const token = jwt.sign(userDetails, secret, { expiresIn: "1h" });
+      response.cookie("jwtToken", token, {
+        httpOnly: true,
+        secure: true,
+        domain: "localhost",
+        path: "/",
+      });
+      response.json({ message: "User registered", user: userDetails });
     } catch (error) {
       console.log(error);
       return response.status(500).json({ error: "Internal Server error" });
