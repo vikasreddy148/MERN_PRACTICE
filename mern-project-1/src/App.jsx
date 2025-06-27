@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import Home from "./Home";
-import Login from "./Login";
+import Home from "./pages/Home";
+import Login from './pages/Login';
 import AppLayout from "./layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Error from "./pages/Error";
@@ -8,8 +8,11 @@ import Logout from "./pages/Logout";
 import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
-import { serverEndpoint } from "./config";
+import { serverEndpoint } from "./config/config";
 import { useDispatch, useSelector } from "react-redux";
+import UserLayout from "./layout/UserLayout";
+import Register from "./pages/Register";
+
 import { SET_USER } from "./redux/user/actions";
 
 function App() {
@@ -47,7 +50,9 @@ function App() {
             path="/"
             element={
               userDetails ? (
-                <Navigate to={"/dashboard"} />
+                <UserLayout>
+                  <Navigate to="/dashboard" />
+                </UserLayout>
               ) : (
                 <AppLayout>
                   <Home />
@@ -59,7 +64,9 @@ function App() {
             path="/login"
             element={
               userDetails ? (
-                <Navigate to={"/dashboard"} />
+                <UserLayout>
+                  <Dashboard />
+                </UserLayout>
               ) : (
                 <AppLayout>
                   <Login />
@@ -67,6 +74,12 @@ function App() {
               )
             }
           />
+          <Route path ="/register" element = {userDetails ? 
+            <Navigate to="/dashboard" />: 
+            <AppLayout>
+              <Register />
+            </AppLayout>
+          }/>
           <Route
             path="/dashboard"
             element={userDetails ? <Dashboard /> : <Navigate to={"/login"} />}
@@ -79,7 +92,10 @@ function App() {
             path="/error"
             element={
               userDetails ? (
-                <Error />
+                <UserLayout>
+                  <Error />
+                </UserLayout>
+                
               ) : (
                 <AppLayout>
                   <Error />

@@ -5,19 +5,17 @@ import { serverEndpoint } from "../config/config";
 import { useDispatch } from "react-redux";
 import { SET_USER } from "../redux/user/actions";
 
-function Register() {
+function Login() {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    name: "",
   });
-
   const [errors, setErrors] = useState({});
 
-  const handleChange = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
+  const handleChange = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
 
     setFormData({
       ...formData,
@@ -26,62 +24,54 @@ function Register() {
   };
 
   const validate = () => {
-    let newErrors = {};
     let isValid = true;
+    let newErrors = {};
 
     if (formData.username.length === 0) {
-      newErrors.username = "Username is mandatory";
       isValid = false;
+      newErrors.username = "Username is mandatory";
     }
 
     if (formData.password.length === 0) {
+      isValid = false;
       newErrors.password = "Password is mandatory";
-      isValid = false;
-    }
-
-    if (formData.name.length === 0) {
-      newErrors.name = "Name is mandatory";
-      isValid = false;
     }
 
     setErrors(newErrors);
     return isValid;
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     if (validate()) {
+      // Data to be sent to the server
       const body = {
         username: formData.username,
         password: formData.password,
-        name: formData.name,
       };
-      const configuration = {
+      const config = {
+        // Tells axios to include cookie in the request + some other auth headers
         withCredentials: true,
       };
-
       try {
         const response = await axios.post(
-          `${serverEndpoint}/auth/register`,
+          `${serverEndpoint}/auth/login`,
           body,
-          configuration
+          config
         );
         dispatch({
           type: SET_USER,
           payload: response.data.user,
         });
       } catch (error) {
-        if (error?.response?.status === 401) {
-          setErrors({ message: "User exists with the given email" });
-        } else {
-          setErrors({ message: "Something went wrong, please try again" });
-        }
+        console.log(error);
+        setErrors({ message: "Something went wrong, please try again" });
       }
     }
   };
 
-  const handleGoogleSignin = async (authResponse) => {
+  const handleGoogleSuccess = async (authResponse) => {
     try {
       const response = await axios.post(
         `${serverEndpoint}/auth/google-auth`,
@@ -92,28 +82,29 @@ function Register() {
           withCredentials: true,
         }
       );
-
       dispatch({
         type: SET_USER,
-        payload: response.data.userDetails,
+        payload: response.data.user,
       });
     } catch (error) {
       console.log(error);
-      setErrors({ message: "Something went wrong while Google sign-in" });
+      setErrors({ message: "Error processing Google auth, please try again" });
     }
   };
 
-  const handleGoogleSigninFailure = async (error) => {
+  const handleGoogleError = async (error) => {
     console.log(error);
-    setErrors({ message: "Something went wrong while Google sign-in" });
+    setErrors({
+      message: "Error in Google authorization flow, please try again",
+    });
   };
 
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-md-4">
-          <h2 className="text-center mb-4">Sign up with a new account</h2>
-          {/* Error Alert */}
+          <h2 className="text-center mb-4">Sign in to Continue</h2>
+        {/* Error Alert */}
           {errors.message && (
             <div className="alert alert-danger" role="alert">
               {errors.message}
@@ -121,23 +112,6 @@ function Register() {
           )}
 
           <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">
-                Name
-              </label>
-              <input
-                type="text"
-                className={`form-control ${errors.name ? "is-invalid" : ""}`}
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-              />
-              {errors.name && (
-                <div className="invalid-feedback">{errors.name}</div>
-              )}
-            </div>
-
             <div className="mb-3">
               <label htmlFor="username" className="form-label">
                 Username
@@ -190,11 +164,11 @@ function Register() {
               <hr className="flex-grow-1" />
             </div>
             <GoogleOAuthProvider
-              clientId={import.meta.env.VITE_APP_GOOGLE_CLIENT_ID}
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
             >
               <GoogleLogin
-                onSuccess={handleGoogleSignin}
-                onError={handleGoogleSigninFailure}
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
               />
             </GoogleOAuthProvider>
           </div>
@@ -204,4 +178,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default Login;
