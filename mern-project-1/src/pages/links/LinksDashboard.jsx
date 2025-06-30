@@ -12,7 +12,44 @@ function LinksDashboard() {
   const [linksData, setLinksData] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
-  const handleOpenModal = () => {
+  const [isEdit, setIsEdit] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleShowDeleteModal = (linkId) => {
+    setFormData({
+      id: linkId,
+    });
+    setShowDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${serverEndpoint}/links/${formData.id}`, {
+        withCredentials: true,
+      });
+      await fetchLinks();
+      handleCloseDeleteModal();
+    } catch (error) {
+      setErrors({ message: "Unable to delete the link, please try again" });
+    }
+  };
+
+  const handleOpenModal = (isEdit, data = {}) => {
+    if (isEdit) {
+      setFormData({
+        id: data._id,
+        campaignTitle: data.campaignTitle,
+        originalUrl: data.originalUrl,
+        category: data.category,
+      });
+    }
+
+    setIsEdit(isEdit);
     setShowModal(true);
   };
   const handleCloseModal = () => {
@@ -62,7 +99,7 @@ function LinksDashboard() {
 
     if (validate()) {
       const body = {
-        campaign_title: formData.campaignTitle.username,
+        campaign_title: formData.campaignTitle,
         original_url: formData.originalUrl,
         category: formData.category,
       };
@@ -71,7 +108,15 @@ function LinksDashboard() {
       };
 
       try {
-        await axios.post(`${serverEndpoint}/links`, body, configuration);
+        if (isEdit) {
+          await axios.put(
+            `${serverEndpoint}/links/${formData.id}`,
+            body,
+            configuration
+          );
+        } else {
+          await axios.post(`${serverEndpoint}/links`, body, configuration);
+        }
         await fetchLinks();
 
         setFormData({
@@ -115,10 +160,10 @@ function LinksDashboard() {
       renderCell: (params) => (
         <>
           <IconButton>
-            <EditIcon />
+            <EditIcon onClick={() => handleOpenModal(true, params.row)} />
           </IconButton>
           <IconButton>
-            <DeleteIcon />
+            <DeleteIcon onClick={() => handleShowDeleteModal(params.row._id)} />
           </IconButton>
         </>
       ),
@@ -129,8 +174,11 @@ function LinksDashboard() {
     <div className="container py-4">
       <div className="d-flex justify-content-between mb-3">
         <h1>Manage Affiliate Links</h1>
-        <button className="btn btn-primary btn-sm" onClick={handleOpenModal}>
-          + Add
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={() => handleOpenModal(false)}
+        >
+          {isEdit ? <>Update Link</> : <>Add Link</>}
         </button>
       </div>
 
@@ -230,6 +278,25 @@ function LinksDashboard() {
             </div>
           </form>
         </Modal.Body>
+      </Modal>
+      <Modal show={showDeleteModal} onHide={() => handleCloseDeleteModal()}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Are you sure you want to delete the link?</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="btn btn-secondary"
+            onClick={() => handleCloseDeleteModal()}
+          >
+            Cancel
+          </button>
+          <button className="btn btn-danger" onClick={() => handleDelete()}>
+            Delete
+          </button>
+        </Modal.Footer>
       </Modal>
     </div>
   );
