@@ -78,7 +78,7 @@ function Register() {
           setErrors({ message: "Something went wrong, please try again" });
         }
       }
-    }
+    } 
   };
 
   const handleGoogleSignin = async (authResponse) => {
