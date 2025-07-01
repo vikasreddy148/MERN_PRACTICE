@@ -30,6 +30,7 @@ const authController = {
         id: data._id,
         name: data.name,
         email: data.email,
+        role: data.role ? data.role : "admin", // backward compactability
       };
       const token = jwt.sign(user, secret, { expiresIn: "1h" });
       response.cookie("jwtToken", token, {
@@ -78,6 +79,7 @@ const authController = {
         email: username,
         password: encryptedPassword,
         name: name,
+        role: data.role ? data.role : "admin",
       });
       await user.save();
       const userDetails = {
@@ -118,6 +120,8 @@ const authController = {
           name: name,
           isGoogleUser: true,
           googleId: googleId,
+          role: 'admin'
+
         });
         await data.save();
       }
@@ -125,6 +129,7 @@ const authController = {
         id: data._id ? data._id : googleId,
         username: email,
         name: name,
+        role: data.role ? data.role : "admin", // this is the ensure backward compactability
       };
       const token = jwt.sign(user, secret, {
         expiresIn: "1h",

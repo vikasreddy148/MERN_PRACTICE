@@ -4,6 +4,8 @@ const express = require("express"); // Include the express module
 
 const authRoutes = require("./src/routes/authRoutes");
 const linksRoutes = require('./src/routes/linksRoutes');
+const userRouutes = require('./src/routes/userRoutes');
+
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
@@ -22,6 +24,7 @@ const corsOptions = {
 app.use(cors(corsOptions ));
 app.use("/auth", authRoutes);
 app.use('/links',linksRoutes);
+app.use('/users',userRouutes);
 const PORT = 5001;
 app.listen(5001, (error) => {
   if (error) {

@@ -1,4 +1,3 @@
-
 const Links = require("../model/Links");
 
 const linksController = {
@@ -10,7 +9,10 @@ const linksController = {
         campaignTitle: campaign_title,
         originalUrl: original_url,
         category: category,
-        user: request.user.id, // Coming from middleware; AuthMiddleware
+        user:
+          request.user.role === "admin"
+            ? request.user.id
+            : request.user.adminId, // Coming from middleware; AuthMiddleware
       });
       link.save();
       response.json({
@@ -26,7 +28,9 @@ const linksController = {
 
   getAll: async (request, response) => {
     try {
-      const links = await Links.find({ user: request.user.id }).sort({
+      const userId =
+        request.user.role === "admin" ? request.user.id : request.user.adminId;
+      const links = await Links.find({ user: userId }).sort({
         createdAt: -1,
       });
       response.json({ data: links });
@@ -51,7 +55,9 @@ const linksController = {
       }
 
       // Make sure the link indeed belong to the logged in user.
-      if (link.user.toString() !== request.user.id) {
+      const userId =
+        request.user.role === "admin" ? request.user.id : request.user.adminId;
+      if (link.user.toString() !== userId) {
         return response.status(403).json({
           error: "Unauthorized access",
         });
@@ -79,7 +85,9 @@ const linksController = {
       }
 
       // Make sure the link indeed belong to the logged in user.
-      if (link.user.toString() !== request.user.id) {
+      const userId =
+        request.user.role === "admin" ? request.user.id : request.user.adminId;
+      if (link.user.toString() !== userId) {
         return response.status(403).json({
           error: "Unauthorized access",
         });
@@ -119,7 +127,9 @@ const linksController = {
       }
 
       // Make sure the link indeed belong to the logged in user.
-      if (link.user.toString() !== request.user.id) {
+      const userId =
+        request.user.role === "admin" ? request.user.id : request.user.adminId;
+      if (link.user.toString() !== userId) {
         return response.status(403).json({
           error: "Unauthorized access",
         });
