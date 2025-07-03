@@ -31,6 +31,7 @@ const authController = {
         name: data.name,
         email: data.email,
         role: data.role ? data.role : "admin", // backward compactability
+        adminId : data.adminId
       };
       const token = jwt.sign(user, secret, { expiresIn: "1h" });
       response.cookie("jwtToken", token, {
