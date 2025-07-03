@@ -2,21 +2,22 @@ import IconButton from "@mui/material/IconButton";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { serverEndpoint } from "../../config/config";
 import { Modal } from "react-bootstrap";
-import { usePermissions } from "../../rbac/usersPermissions";
+import { usePermission } from "../../rbac/usersPermissions";
+
 function LinksDashboard() {
   const [errors, setErrors] = useState({});
   const [linksData, setLinksData] = useState([]);
-  const [showModal, setShowModal] = useState(false);
 
+  const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const permission = usePermissions();
+  const permission = usePermission();
+
   const handleShowDeleteModal = (linkId) => {
     setFormData({
       id: linkId,
@@ -53,14 +54,17 @@ function LinksDashboard() {
     setIsEdit(isEdit);
     setShowModal(true);
   };
+
   const handleCloseModal = () => {
     setShowModal(false);
   };
+
   const [formData, setFormData] = useState({
     campaignTitle: "",
     originalUrl: "",
     category: "",
   });
+
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -75,26 +79,24 @@ function LinksDashboard() {
     let newErrors = {};
     let isValid = true;
     if (formData.campaignTitle.length === 0) {
-      newErrors.campaignTitle = "CampaignTitle is mandatory";
-
+      newErrors.campaignTitle = "Campaign Title is mandatory";
       isValid = false;
     }
 
     if (formData.originalUrl.length === 0) {
-      newErrors.originalUrl = "URL ismandatory";
-
+      newErrors.originalUrl = "URL is mandatory";
       isValid = false;
     }
 
     if (formData.category.length === 0) {
-      newErrors.category = "Category ismandatory";
-
+      newErrors.category = "Category is mandatory";
       isValid = false;
     }
 
     setErrors(newErrors);
     return isValid;
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -107,7 +109,6 @@ function LinksDashboard() {
       const configuration = {
         withCredentials: true,
       };
-
       try {
         if (isEdit) {
           await axios.put(
@@ -118,20 +119,21 @@ function LinksDashboard() {
         } else {
           await axios.post(`${serverEndpoint}/links`, body, configuration);
         }
-        await fetchLinks();
 
+        await fetchLinks();
         setFormData({
-          campaign_title: "",
-          original_url: "",
+          campaignTitle: "",
+          originalUrl: "",
           category: "",
         });
       } catch (error) {
-        setErrors({ message: "Unable to addthe Link, pleas try again " });
+        setErrors({ message: "Unable to add the Link, please try again" });
       } finally {
         handleCloseModal();
       }
     }
   };
+
   const fetchLinks = async () => {
     try {
       const response = await axios.get(`${serverEndpoint}/links`, {
@@ -140,8 +142,8 @@ function LinksDashboard() {
       setLinksData(response.data.data);
     } catch (error) {
       console.log(error);
-      SetErrors({
-        message: "unable to fetch links at the moment. please try again later",
+      setErrors({
+        message: "Unable to fetch links at the moment. Please try again",
       });
     }
   };
@@ -149,6 +151,7 @@ function LinksDashboard() {
   useEffect(() => {
     fetchLinks();
   }, []);
+
   const columns = [
     { field: "campaignTitle", headerName: "Campaign", flex: 2 },
     {
@@ -171,7 +174,7 @@ function LinksDashboard() {
     { field: "clickCount", headerName: "Clicks", flex: 1 },
     {
       field: "action",
-      headerName: "Actions",
+      headerName: "Clicks",
       flex: 1,
       renderCell: (params) => (
         <>
@@ -180,6 +183,7 @@ function LinksDashboard() {
               <EditIcon onClick={() => handleOpenModal(true, params.row)} />
             </IconButton>
           )}
+
           {permission.canDeleteLink && (
             <IconButton>
               <DeleteIcon
@@ -195,7 +199,7 @@ function LinksDashboard() {
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between mb-3">
-        <h1>Manage Affiliate Links</h1>
+        <h2>Manage Affiliate Links</h2>
         {permission.canAddLink && (
           <button
             className="btn btn-primary btn-sm"
@@ -211,32 +215,34 @@ function LinksDashboard() {
           {errors.message}
         </div>
       )}
+
       <div style={{ height: 500, width: "100%" }}>
         <DataGrid
           getRowId={(row) => row._id}
           rows={linksData}
           columns={columns}
-          intitialState={{
+          initialState={{
             pagination: {
               paginationModel: { pageSize: 20, page: 0 },
             },
           }}
           pageSizeOptions={[20, 50, 100]}
           disableRowSelectionOnClick
+          showToolbar
           sx={{
             fontFamily: "inherit",
           }}
           density="compact"
         />
       </div>
-      <Modal show={showModal} onHide={handleCloseModal}>
+
+      <Modal show={showModal} onHide={() => handleCloseModal()}>
         <Modal.Header closeButton>
           <Modal.Title>{isEdit ? <>Update Link</> : <>Add Link</>}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <form onSubmit={handleSubmit}>
-            {/* Campaign Title */}
             <div className="mb-3">
               <label htmlFor="campaignTitle" className="form-label">
                 Campaign Title
@@ -256,7 +262,6 @@ function LinksDashboard() {
               )}
             </div>
 
-            {/* Original URL */}
             <div className="mb-3">
               <label htmlFor="originalUrl" className="form-label">
                 URL
@@ -276,7 +281,6 @@ function LinksDashboard() {
               )}
             </div>
 
-            {/* Category */}
             <div className="mb-3">
               <label htmlFor="category" className="form-label">
                 Category
@@ -304,6 +308,7 @@ function LinksDashboard() {
           </form>
         </Modal.Body>
       </Modal>
+
       <Modal show={showDeleteModal} onHide={() => handleCloseDeleteModal()}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>

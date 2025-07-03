@@ -5,9 +5,7 @@ import { ROLE_PERMISSIONS } from "./usersPermissions";
 function Can({ permission, children }) {
   const user = useSelector((state) => state.userDetails);
   const permissions = ROLE_PERMISSIONS[user?.role] || {};
-  console.log(user);
-  console.log(permissions);
-  console.log(permissions[permission]);
+
   return permissions[permission] ? children : null;
 }
 
