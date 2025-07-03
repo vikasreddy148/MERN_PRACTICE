@@ -3,8 +3,10 @@ const bcrypt = require("bcryptjs");
 const Users = require("../model/Users");
 const { OAuth2Client } = require("google-auth-library");
 const { validationResult } = require("express-validator");
+
 //https://www.uuidgenerator.net/
 const secret = process.env.JWT_SECRET;
+
 const authController = {
   login: async (request, response) => {
     try {
@@ -31,7 +33,8 @@ const authController = {
         name: data.name,
         email: data.email,
         role: data.role ? data.role : "admin", // backward compactability
-        adminId : data.adminId
+        adminId: data.adminId,
+        credits: data.credits,
       };
       const token = jwt.sign(user, secret, { expiresIn: "1h" });
       response.cookie("jwtToken", token, {
@@ -50,16 +53,21 @@ const authController = {
     response.clearCookie("jwtToken");
     response.json({ message: "Logout Successfull" });
   },
-  isUserLoggedIn: (request, response) => {
+  isUserLoggedIn: async (request, response) => {
     const token = request.cookies.jwtToken;
     if (!token) {
       return response.status(401).json({ message: "Unauthorized access" });
     }
-    jwt.verify(token, secret, (error, user) => {
+    jwt.verify(token, secret, async (error, user) => {
       if (error) {
         return response.status(401).json({ message: "Unauthorized access" });
       } else {
-        response.json({ message: "User is logged in", user: user });
+        const latestUserDetails = await Users.findById({ _id: user.id });
+
+        response.json({
+          message: "User is logged in",
+          user: latestUserDetails,
+        });
       }
     });
   },
@@ -80,13 +88,14 @@ const authController = {
         email: username,
         password: encryptedPassword,
         name: name,
-        role: data.role ? data.role : "admin",
+        role: "admin",
       });
       await user.save();
       const userDetails = {
         id: user._id,
         name: user.name,
         email: user.email,
+        credits: user.credits,
       };
       const token = jwt.sign(userDetails, secret, { expiresIn: "1h" });
       response.cookie("jwtToken", token, {
@@ -121,8 +130,7 @@ const authController = {
           name: name,
           isGoogleUser: true,
           googleId: googleId,
-          role: 'admin'
-
+          role: user.role,
         });
         await data.save();
       }
@@ -131,6 +139,7 @@ const authController = {
         username: email,
         name: name,
         role: data.role ? data.role : "admin", // this is the ensure backward compactability
+        credits: data.credits,
       };
       const token = jwt.sign(user, secret, {
         expiresIn: "1h",

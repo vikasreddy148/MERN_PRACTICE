@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require("express"); // Include the express module
-
+const paymentRoutes = require('./src/routes/paymentRoutes')
 const authRoutes = require("./src/routes/authRoutes");
 const linksRoutes = require('./src/routes/linksRoutes');
 const userRouutes = require('./src/routes/userRoutes');
@@ -25,6 +25,7 @@ app.use(cors(corsOptions ));
 app.use("/auth", authRoutes);
 app.use('/links',linksRoutes);
 app.use('/users',userRouutes);
+app.use('/payments',paymentRoutes)
 const PORT = 5001;
 app.listen(5001, (error) => {
   if (error) {

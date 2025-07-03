@@ -8,6 +8,7 @@ const permissions = {
     "link:read",
     "link:update",
     "link:delete",
+    "payment:create",
   ],
   developer: ["link:read"],
   viewer: ["link:read", "user:read"],
