@@ -1,14 +1,14 @@
 const Links = require("../model/Links");
 const Users = require("../model/Users");
+
 const linksController = {
   create: async (request, response) => {
     const { campaign_title, original_url, category } = request.body;
 
     try {
-      // We're fetching user details from DBeven though we have
-
-      // it available in request object. Thereason is critical operation.
-      // We're dealing with money and we wantto pull latest information
+      // We're fetching user details from DB even though we have
+      // it available in request object. The reason is critical operation.
+      // We're dealing with money and we want to pull latest information
       // whenever we're transacting.
       const user = await Users.findById({ _id: request.user.id });
       if (user.credits < 1) {
@@ -16,6 +16,7 @@ const linksController = {
           message: "Insufficient credit balance",
         });
       }
+
       const link = new Links({
         campaignTitle: campaign_title,
         originalUrl: original_url,
@@ -23,7 +24,7 @@ const linksController = {
         user:
           request.user.role === "admin"
             ? request.user.id
-            : request.user.adminId, // Coming from middleware; AuthMiddleware
+            : request.user.adminId,
       });
       await link.save();
 
@@ -44,9 +45,7 @@ const linksController = {
     try {
       const userId =
         request.user.role === "admin" ? request.user.id : request.user.adminId;
-      const links = await Links.find({ user: userId }).sort({
-        createdAt: -1,
-      });
+      const links = await Links.find({ user: userId }).sort({ createdAt: -1 });
       response.json({ data: links });
     } catch (error) {
       console.log(error);
@@ -68,9 +67,9 @@ const linksController = {
         return response.status(404).json({ error: "LinkID does not exist" });
       }
 
-      // Make sure the link indeed belong to the logged in user.
       const userId =
         request.user.role === "admin" ? request.user.id : request.user.adminId;
+      // Make sure the link indeed belong to the logged in user.
       if (link.user.toString() !== userId) {
         return response.status(403).json({
           error: "Unauthorized access",
@@ -98,9 +97,9 @@ const linksController = {
         return response.status(404).json({ error: "LinkID does not exist" });
       }
 
-      // Make sure the link indeed belong to the logged in user.
       const userId =
         request.user.role === "admin" ? request.user.id : request.user.adminId;
+      // Make sure the link indeed belong to the logged in user.
       if (link.user.toString() !== userId) {
         return response.status(403).json({
           error: "Unauthorized access",
@@ -140,9 +139,9 @@ const linksController = {
         return response.status(404).json({ error: "LinkID does not exist" });
       }
 
-      // Make sure the link indeed belong to the logged in user.
       const userId =
         request.user.role === "admin" ? request.user.id : request.user.adminId;
+      // Make sure the link indeed belong to the logged in user.
       if (link.user.toString() !== userId) {
         return response.status(403).json({
           error: "Unauthorized access",
