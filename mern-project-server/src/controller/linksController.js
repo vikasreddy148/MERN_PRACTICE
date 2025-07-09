@@ -11,9 +11,12 @@ const linksController = {
       // We're dealing with money and we want to pull latest information
       // whenever we're transacting.
       const user = await Users.findById({ _id: request.user.id });
-      if (user.credits < 1) {
+
+      const hasActiveSubscription =
+        user.subscription && user.subscription.status === "active";
+      if (!hasActiveSubscription && user.credits < 1) {
         return response.status(400).json({
-          message: "Insufficient credit balance",
+          message: "Insufficient credit balance or no active subscription",
         });
       }
 
@@ -27,9 +30,10 @@ const linksController = {
             : request.user.adminId,
       });
       await link.save();
-
-      user.credits -= 1;
-      await user.save();
+      if (!hasActiveSubscription) {
+        user.credits -= 1;
+        await user.save();
+      }
       response.json({
         data: { linkId: link._id },
       });
