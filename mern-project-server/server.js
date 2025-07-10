@@ -17,7 +17,7 @@ const app = express(); // Instantiate express app.
 app.use((request, response, next) => {
   // Skip json middleware for the webhook endpoint
   if (request.originalUrl.startsWith("/payments/webhook")) {
-    next();
+    return next();
   }
 
   express.json()(request, response, next);

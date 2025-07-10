@@ -76,7 +76,6 @@ const paymentController = {
   createSubscription: async (request, response) => {
     try {
       const { plan_name } = request.body;
-
       if (!PLAN_IDS[plan_name]) {
         return response.status(400).json({
           message: "Invalid plan name",
@@ -92,7 +91,6 @@ const paymentController = {
           userId: request.user.id,
         },
       });
-
       response.json({ subscription: subscription });
     } catch (error) {
       console.log(error);
@@ -109,14 +107,12 @@ const paymentController = {
       const user = await Users.findById({ _id: request.user.id });
 
       // We'll use this entry to prevent user from subscribing again
-      // from the UI, while we wait for activated event fromrazorpay.
-
+      // from the UI, while we wait for activated event from razorpay.
       user.subscription = {
         id: subscription_id,
         planId: subscription.plan_id,
         status: subscription.status,
       };
-
       await user.save();
       response.json({ user: user });
     } catch (error) {
@@ -150,7 +146,6 @@ const paymentController = {
   handleWebhookEvent: async (request, response) => {
     try {
       console.log("Received event");
-
       const signature = request.headers["x-razorpay-signature"];
       const body = request.body;
 
@@ -170,7 +165,6 @@ const paymentController = {
       const subscriptionData = payload.payload.subscription.entity;
       const razorpaySubscriptionId = subscriptionData.id;
       const userId = subscriptionData.notes?.userId;
-
       if (!userId) {
         console.log("UserId not found in notes");
         return response.status(400).send("UserId not found in notes");
@@ -226,10 +220,9 @@ const paymentController = {
         return response.status(400).send("UserId is not valid");
       }
 
-      console.log(
-        `Updated subscription status for user ${user.username} to ${newStatus}`
-      );
-      return response.status(200).send(`Event processed for user: ${userId}`);
+      console.log(`Updated subscription status for user ${user.username}
+                to ${newStatus}`);
+      return response.status(200).send(`Event processed successfully`);
     } catch (error) {
       console.log(error);
       return response.status(500).json({

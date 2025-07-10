@@ -5,12 +5,12 @@ const CREDIT_PACKS = {
   100:100
 };
 const PLAN_IDS = {
-  UNLIMTED_YEARLY: {
+  UNLIMITED_YEARLY: {
     id: process.env.RAZORPAY_YEARLY_PLAN_ID,
     planName: "Unlimited Yearly",
     totalBillingCycleCount: 5,
   },
-  UNLIMTED_MONTHLY: {
+  UNLIMITED_MONTHLY: {
     id: process.env.RAZORPAY_MONTHLY_PLAN_ID,
     planName: "Unlimited Monthly",
     totalBillingCycleCount: 12,

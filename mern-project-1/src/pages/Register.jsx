@@ -78,7 +78,7 @@ function Register() {
           setErrors({ message: "Something went wrong, please try again" });
         }
       }
-    } 
+    }
   };
 
   const handleGoogleSignin = async (authResponse) => {
@@ -95,7 +95,7 @@ function Register() {
 
       dispatch({
         type: SET_USER,
-        payload: response.data.userDetails,
+        payload: response.data.user,
       });
     } catch (error) {
       console.log(error);
@@ -190,7 +190,7 @@ function Register() {
               <hr className="flex-grow-1" />
             </div>
             <GoogleOAuthProvider
-              clientId={import.meta.env.VITE_APP_GOOGLE_CLIENT_ID}
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
             >
               <GoogleLogin
                 onSuccess={handleGoogleSignin}
