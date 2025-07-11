@@ -1,5 +1,8 @@
 const Links = require("../model/Links");
 const Users = require("../model/Users");
+const axios = require('axios');
+const { getDeviceInfo } = require("../util/linkUtil");
+const Clicks = require("../model/Clicks");
 
 const linksController = {
   create: async (request, response) => {
@@ -173,6 +176,36 @@ const linksController = {
       if (!link) {
         return response.status(404).json({ error: "LinkID does not exist" });
       }
+      const isDevelopment = process.env.NODE_ENV === "development";
+      const ipAddress = isDevelopment
+        ? "8.8.8.8"
+        : request.headers["x-forwarded-for"]?.split(",")[0] ||
+          request.socket.remoteAddress;
+      const geoResponse = await axios.get(
+        `http://ip-api.com/json/${ipAddress}`
+      );
+      const { city, country, region, lat, lon, isp } = geoResponse.data;
+      const userAgent = request.headers["user-agent"] || "unknown";
+      const { isMobile, browser } = getDeviceInfo(userAgent);
+      const deviceType = isMobile ? "Mobile" : "Desktop";
+
+      const referrer = request.get("Referrer") || null;
+
+      await Clicks.create({
+        linkId: link._id,
+        ip: ipAddress,
+        city: city,
+        country: country,
+        region: region,
+        latitude: lat,
+        longitude: lon,
+        isp: isp,
+        referrer: referrer,
+        userAgent: userAgent,
+        deviceType: deviceType,
+        browser: browser,
+        clickedAt: new Date(),
+      });
 
       link.clickCount += 1;
       await link.save();
@@ -182,6 +215,37 @@ const linksController = {
       console.log(error);
       response.status(500).json({
         error: "Internal server error",
+      });
+    }
+  },
+  analytics: async (request, response) => {
+    try {
+      const { linkId, from, to } = request.query;
+      const link = await Links.findById({ _id: linkId });
+      if (!link) {
+        return response.status(404).json({
+          error: "Link not found",
+        });
+      }
+      const userId =
+        request.user.role === "admin" ? request.user.id : request.user.adminId;
+      if (link.user.toString() !== userId) {
+        return response.status(403).json({
+          error: "Unauthorized",
+        });
+      }
+      const query = {
+        linkId: linkId,
+      };
+      if (from && to) {
+        query.clickedAt = { $gte: new Date(from), $lte: new Date(to) };
+      }
+      const data = await Clicks.find(query).sort({ clickedAt: -1 });
+      response.json(data);
+    } catch (error) {
+      console.log(error);
+      return response.status(500).json({
+        message: "Internal server error",
       });
     }
   },

@@ -17,6 +17,7 @@ import ManageUsers from "./pages/users/ManageUsers";
 import UnauthorizedAccess from "./components/UnauthorizedAccess";
 import ProtectedRoute from "./rbac/ProtectedRoute";
 import ManagePayments from "./pages/payments/ManagePayments";
+import AnalyticsDashboard from "./pages/links/AnalyticsDashboard";
 function App() {
   // const [userDetails, setUserDetails] = useState(null);
   const dispatch = useDispatch();
@@ -156,6 +157,18 @@ function App() {
           userDetails ? (
             <UserLayout>
               <ManagePayments />
+            </UserLayout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/analytics/:id"
+        element={
+          userDetails ? (
+            <UserLayout>
+              <AnalyticsDashboard />
             </UserLayout>
           ) : (
             <Navigate to="/login" />

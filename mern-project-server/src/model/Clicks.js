@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
-const clickSchema = new mongoose.Schema({
+const clicksSchema = new mongoose.Schema({
   linkId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Links",
     required: true,
   },
-  iP: String,
+  ip: String,
   city: String,
   country: String,
   region: String,
@@ -20,4 +20,4 @@ const clickSchema = new mongoose.Schema({
   clickedAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('Clicks',clickSchema);
+module.exports = mongoose.model("Clicks", clicksSchema);
