@@ -98,7 +98,7 @@ function AnalyticsDashboard() {
 
   useEffect(() => {
     fetchAnalytics();
-  }, [analyticsData, fromDate, toDate]);
+  }, [fromDate, toDate, id]);
 
   return (
     <div className="container py-5">

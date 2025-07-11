@@ -8,9 +8,9 @@ function Home() {
       style={{ minHeight: "70vh" }}
     >
       <img src={reactLogo} alt="Affiliate+ Logo" width={80} className="mb-3" />
-      <h1 className="mb-3 fw-bold text-primary">Welcome to Affiliate+</h1>
+      <h1 className="mb-3 fw-bold text-primary">Welcome to Affiliate++</h1>
       <p className="lead text-center mb-4" style={{ maxWidth: 600 }}>
-        Affiliate+ is your all-in-one platform to manage, track, and analyze
+        Affiliate++ is your all-in-one platform to manage, track, and analyze
         your marketing links. Gain insights into your campaigns, monitor clicks,
         and optimize your performance. Purchase credits or subscribe for
         unlimited access, all with secure authentication and user management.

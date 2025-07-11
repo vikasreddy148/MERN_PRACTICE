@@ -26,7 +26,7 @@ export const ROLE_PERMISSIONS = {
     canCreateUser: false,
     canDeleteUser: false,
     canEditUser: false,
-    canViewLink: false,
+    canViewLink: true, // allow analytics
     canCreateLink: false,
     canDeleteLink: false,
     canEditLink: false,

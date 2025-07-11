@@ -157,9 +157,11 @@ function App() {
         path="/manage-payments"
         element={
           userDetails ? (
-            <UserLayout>
-              <ManagePayments />
-            </UserLayout>
+            <ProtectedRoute roles={["admin", "developer"]}>
+              <UserLayout>
+                <ManagePayments />
+              </UserLayout>
+            </ProtectedRoute>
           ) : (
             <Navigate to="/login" />
           )
