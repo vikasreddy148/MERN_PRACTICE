@@ -15,6 +15,23 @@ const authMiddleware = {
         request.user = user;
         next();
       } catch (error) {
+        const refreshToken = request.cookies?.jwtRefreshToken;
+        if (refreshToken) {
+          const { newAccessToken, user } = await attemotToRefreshToken(
+            refreshToken
+          );
+          response.cookie("jwtToken", newAccessToken, {
+            httpOnly: true,
+            secure: true,
+            domain: "localhost",
+            path: "/",
+          });
+          console.log('Refresh Token renewed the access token')
+          return response.json({
+            message: "User is logged in",
+            user: user,
+          });
+        }
         return response.status(401).json({
           error: "Unauthorized access",
         });

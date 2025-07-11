@@ -3,9 +3,10 @@ const bcrypt = require("bcryptjs");
 const Users = require("../model/Users");
 const { OAuth2Client } = require("google-auth-library");
 const { validationResult } = require("express-validator");
-
+const { attemotToRefreshToken } = require("../util/authUtil");
 // https://www.uuidgenerator.net/
 const secret = process.env.JWT_SECRET;
+const refreshSecret = process.env.JWT_REFRESH_TOKEN_SECRET;
 
 const authController = {
   login: async (request, response) => {
@@ -37,11 +38,19 @@ const authController = {
         role: data.role ? data.role : "admin",
         adminId: data.adminId,
         credits: data.credits,
-        subscription: data.subscription
+        subscription: data.subscription,
       };
 
       const token = jwt.sign(user, secret, { expiresIn: "1h" });
       response.cookie("jwtToken", token, {
+        httpOnly: true,
+        secure: true,
+        domain: "localhost",
+        path: "/",
+      });
+      const refreshToken = jwt.sign(user, refreshSecret, { expiresIn: "7d" });
+      //store it in the database if you want! Storing in DB will make refresh token more secure and you can revoke it if needed by deleting it from the database
+      response.cookie("jwtRefreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
         domain: "localhost",
@@ -68,6 +77,24 @@ const authController = {
 
     jwt.verify(token, secret, async (error, user) => {
       if (error) {
+        const refreshToken = request.cookies?.jwtRefreshToken;
+        if (refreshToken) {
+          const { newAccessToken, user } = await attemotToRefreshToken(
+            refreshToken
+          );
+          response.cookie("jwtToken", newAccessToken, {
+            httpOnly: true,
+            secure: true,
+            domain: "localhost",
+            path: "/",
+          });
+          console.log("Refresh Token renewed the access token");
+          return response.json({
+            message: "User is logged in",
+            user: user,
+          });
+        }
+        
         return response.status(401).json({ message: "Unauthorized access" });
       } else {
         const latestUserDetails = await Users.findById({ _id: user.id });
@@ -163,6 +190,13 @@ const authController = {
 
       const token = jwt.sign(user, secret, { expiresIn: "1h" });
       response.cookie("jwtToken", token, {
+        httpOnly: true,
+        secure: true,
+        domain: "localhost",
+        path: "/",
+      });
+      const refreshToken = jwt.sign(user, refreshSecret, { expiresIn: '7d' });
+      response.cookie("jwtRefreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
         domain: "localhost",
