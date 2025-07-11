@@ -4,6 +4,7 @@ const Users = require("../model/Users");
 const { OAuth2Client } = require("google-auth-library");
 const { validationResult } = require("express-validator");
 const { attemotToRefreshToken } = require("../util/authUtil");
+const sendMail = require("../service/emailService");
 // https://www.uuidgenerator.net/
 const secret = process.env.JWT_SECRET;
 const refreshSecret = process.env.JWT_REFRESH_TOKEN_SECRET;
@@ -94,7 +95,7 @@ const authController = {
             user: user,
           });
         }
-        
+
         return response.status(401).json({ message: "Unauthorized access" });
       } else {
         const latestUserDetails = await Users.findById({ _id: user.id });
@@ -195,7 +196,7 @@ const authController = {
         domain: "localhost",
         path: "/",
       });
-      const refreshToken = jwt.sign(user, refreshSecret, { expiresIn: '7d' });
+      const refreshToken = jwt.sign(user, refreshSecret, { expiresIn: "7d" });
       response.cookie("jwtRefreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
@@ -206,6 +207,70 @@ const authController = {
     } catch (error) {
       console.log(error);
       return response.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  sendResetPasswordToken: async (request, response) => {
+    try {
+      const { email } = request.body;
+      if (!email) {
+        return response.status(400).json({ message: "Email is required" });
+      }
+      const user = await Users.findOne({ email });
+      if (!user) {
+        return response.status(404).json({ message: "User not found" });
+      }
+      // Generate 6-digit code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+      user.resetPasswordCode = code;
+      user.resetPasswordExpiry = expiry;
+      await user.save();
+      // Send code via email
+      await sendMail(
+        email,
+        "Your Password Reset Code",
+        `Your password reset code is: ${code}. It will expire in 15 minutes.`
+      );
+      response.json({ message: "Reset code sent to email" });
+    } catch (error) {
+      console.log(error);
+      response.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  resetPassword: async (request, response) => {
+    try {
+      const { email, code, newPassword } = request.body;
+      if (!email || !code || !newPassword) {
+        return response
+          .status(400)
+          .json({ message: "All fields are required" });
+      }
+      const user = await Users.findOne({ email });
+      if (!user) {
+        return response.status(404).json({ message: "User not found" });
+      }
+      if (
+        !user.resetPasswordCode ||
+        !user.resetPasswordExpiry ||
+        user.resetPasswordCode !== code ||
+        user.resetPasswordExpiry < new Date()
+      ) {
+        return response
+          .status(400)
+          .json({ message: "Invalid or expired code" });
+      }
+      // Hash new password
+      const hashed = await bcrypt.hash(newPassword, 10);
+      user.password = hashed;
+      user.resetPasswordCode = undefined;
+      user.resetPasswordExpiry = undefined;
+      await user.save();
+      response.json({ message: "Password reset successful" });
+    } catch (error) {
+      console.log(error);
+      response.status(500).json({ message: "Internal server error" });
     }
   },
 };

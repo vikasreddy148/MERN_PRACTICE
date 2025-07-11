@@ -9,7 +9,8 @@ lerna-debug.log*
 
 node_modules/
 .env
-package-lock.json
+# Ignore all package-lock.json files in all subdirectories
+**/package-lock.json
 dist
 dist-ssr
 *.local

@@ -4,6 +4,7 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { serverEndpoint } from "../config/config";
 import { useDispatch } from "react-redux";
 import { SET_USER } from "../redux/user/actions";
+import { Link } from "react-router-dom";
 
 function Login() {
   const dispatch = useDispatch();
@@ -156,6 +157,9 @@ function Login() {
               </button>
             </div>
           </form>
+          <div className="text-end mt-2">
+            <Link to="/forget-password">Forgot Password?</Link>
+          </div>
 
           <div className="text-center">
             <div className="my-4 d-flex align-items-center text-muted">

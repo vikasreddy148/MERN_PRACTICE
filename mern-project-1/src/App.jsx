@@ -18,6 +18,8 @@ import UnauthorizedAccess from "./components/UnauthorizedAccess";
 import ProtectedRoute from "./rbac/ProtectedRoute";
 import ManagePayments from "./pages/payments/ManagePayments";
 import AnalyticsDashboard from "./pages/links/AnalyticsDashboard";
+import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 function App() {
   // const [userDetails, setUserDetails] = useState(null);
   const dispatch = useDispatch();
@@ -173,6 +175,22 @@ function App() {
           ) : (
             <Navigate to="/login" />
           )
+        }
+      />
+      <Route
+        path="/forget-password"
+        element={
+          <AppLayout>
+            <ForgetPassword />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <AppLayout>
+            <ResetPassword />
+          </AppLayout>
         }
       />
     </Routes>

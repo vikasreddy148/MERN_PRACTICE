@@ -36,8 +36,8 @@ Affiliate++ is a full-stack web application for managing, shortening, and analyz
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/affiliate-plus-mern.git
-cd affiliate-plus-mern
+git clone https://github.com/vikasreddy148/Affliate-Link-Manager.git
+cd Affliate-Link-Manager
 ```
 
 ### 2. Install Dependencies

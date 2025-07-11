@@ -22,6 +22,8 @@ const UserSchema = new mongoose.Schema({
   adminId: { type: mongoose.Schema.Types.ObjectId, ref: "Users", index: true },
   credits: { type: Number, default: 0 },
   subscription: { type: subscriptionSchema, default: () => ({}) },
+  resetPasswordCode: { type: String },
+  resetPasswordExpiry: { type: Date },
 });
 
 module.exports = mongoose.model("users", UserSchema);
