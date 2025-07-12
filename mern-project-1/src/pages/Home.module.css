@@ -1,0 +1,267 @@
+.landingPage {
+  overflow-x: hidden;
+}
+
+.heroSection {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.heroBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+  opacity: 0.3;
+}
+
+.heroContent {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+
+.heroContent.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.textGradient {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heroVisual {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: all 0.8s ease 0.2s;
+}
+
+.heroVisual.slideIn {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.dashboardMockup {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+  transition: transform 0.3s ease;
+}
+
+.dashboardMockup:hover {
+  transform: perspective(1000px) rotateY(-2deg) rotateX(2deg);
+}
+
+.mockupHeader {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.mockupDots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mockupDots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #dee2e6;
+}
+
+.mockupDots span:nth-child(1) {
+  background: #ff5f57;
+}
+
+.mockupDots span:nth-child(2) {
+  background: #ffbd2e;
+}
+
+.mockupDots span:nth-child(3) {
+  background: #28ca42;
+}
+
+.mockupContent {
+  padding: 2rem;
+}
+
+.mockupChart {
+  height: 200px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.mockupChart::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polyline fill="none" stroke="%23ffffff" stroke-width="2" points="10,80 30,60 50,40 70,20 90,10"/></svg>');
+  opacity: 0.3;
+}
+
+.mockupStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.statItem {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.featuresSection {
+  padding: 5rem 0;
+}
+
+.featureCard {
+  padding: 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.featureCard.fadeInUp {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.featureIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+}
+
+.benefitsSection {
+  padding: 5rem 0;
+  background: #f8f9fa;
+}
+
+.benefitsList {
+  margin-bottom: 2rem;
+}
+
+.benefitItem {
+  margin-bottom: 1rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.statCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.statNumber {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.statLabel {
+  font-size: 1rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.ctaSection {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.ctaSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.ctaSection .container {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    min-height: auto;
+    padding: 4rem 0;
+  }
+
+  .dashboardMockup {
+    transform: none;
+    margin-top: 2rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .featureCard {
+    margin-bottom: 2rem;
+  }
+}

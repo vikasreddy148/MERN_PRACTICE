@@ -17,6 +17,7 @@ import {
   FaBell,
   FaSearch,
 } from "react-icons/fa";
+import styles from "./UserHeader.module.css";
 
 function UserHeader() {
   const userDetails = useSelector((state) => state.userDetails);
@@ -49,49 +50,65 @@ function UserHeader() {
 
   const isActive = (path) => location.pathname === path;
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <header className={`user-header ${isScrolled ? "scrolled" : ""}`}>
-      <nav className="navbar navbar-expand-lg">
+    <header
+      className={`${styles.userHeader} ${isScrolled ? styles.scrolled : ""}`}
+    >
+      <nav className={`navbar navbar-expand-lg ${styles.navbar}`}>
         <div className="container">
           {/* Logo */}
           <Link className="navbar-brand" to="/dashboard">
-            <div className="brand-container">
-              <FaRocket className="brand-icon" />
-              <span className="brand-text">Affiliate++</span>
+            <div className={styles.brandContainer}>
+              <FaRocket className={styles.brandIcon} />
+              <span className={styles.brandText}>Affiliate++</span>
             </div>
           </Link>
 
           {/* Mobile Menu Button */}
           <button
-            className="navbar-toggler mobile-menu-btn"
+            className={`navbar-toggler ${styles.mobileMenuBtn}`}
             type="button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={toggleMobileMenu}
             aria-label="Toggle navigation"
           >
             {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
 
           {/* Navigation Menu */}
-          <div className={`navbar-collapse ${isMobileMenuOpen ? "show" : ""}`}>
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+          <div
+            className={`navbar-collapse ${styles.navbarCollapse} ${
+              isMobileMenuOpen ? styles.show : ""
+            }`}
+          >
+            <ul
+              className={`navbar-nav me-auto mb-2 mb-lg-0 ${styles.navbarNav}`}
+            >
               <li className="nav-item">
                 <Link
-                  className={`nav-link ${
-                    isActive("/dashboard") ? "active" : ""
+                  className={`nav-link ${styles.navLink} ${
+                    isActive("/dashboard") ? styles.active : ""
                   }`}
                   to="/dashboard"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   Dashboard
                 </Link>
               </li>
               <li className="nav-item">
                 <Link
-                  className={`nav-link ${
-                    isActive("/manage-payments") ? "active" : ""
+                  className={`nav-link ${styles.navLink} ${
+                    isActive("/manage-payments") ? styles.active : ""
                   }`}
                   to="/manage-payments"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   Payments
                 </Link>
@@ -99,9 +116,11 @@ function UserHeader() {
               <Can permission="canViewUser">
                 <li className="nav-item">
                   <Link
-                    className={`nav-link ${isActive("/users") ? "active" : ""}`}
+                    className={`nav-link ${styles.navLink} ${
+                      isActive("/users") ? styles.active : ""
+                    }`}
                     to="/users"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                   >
                     Users
                   </Link>
@@ -112,98 +131,110 @@ function UserHeader() {
             {/* Right Side Actions */}
             <div className="navbar-nav ms-auto align-items-center">
               {/* Search */}
-              <div className="search-container me-3">
-                <div className="search-input-wrapper">
-                  <FaSearch className="search-icon" />
+              <div className={`${styles.searchContainer} me-3`}>
+                <div className={styles.searchInputWrapper}>
+                  <FaSearch className={styles.searchIcon} />
                   <input
                     type="text"
-                    className="search-input"
+                    className={styles.searchInput}
                     placeholder="Search links..."
                   />
                 </div>
               </div>
 
               {/* Notifications */}
-              <div className="notification-icon me-3">
+              <div className={`${styles.notificationIcon} me-3`}>
                 <FaBell />
-                <span className="notification-badge">3</span>
+                <span className={styles.notificationBadge}>3</span>
               </div>
 
               {/* User Profile Dropdown */}
-              <div className="user-dropdown">
+              <div className={styles.userDropdown}>
                 <button
-                  className="user-dropdown-toggle"
+                  className={styles.userDropdownToggle}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
-                  <div className="user-avatar">
+                  <div className={styles.userAvatar}>
                     <FaUser />
                   </div>
-                  <div className="user-info">
-                    <span className="user-name">
+                  <div className={styles.userInfo}>
+                    <span className={styles.userName}>
                       {userDetails?.name || "User"}
                     </span>
-                    <span className="user-role">
+                    <span className={styles.userRole}>
                       {userDetails?.role || "User"}
                     </span>
                   </div>
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="dropdown-menu show">
-                    <div className="dropdown-header">
-                      <div className="user-avatar-large">
+                  <div className={styles.dropdownMenu}>
+                    <div className={styles.dropdownHeader}>
+                      <div className={styles.userAvatarLarge}>
                         <FaUser />
                       </div>
-                      <div className="user-details">
-                        <span className="user-name-large">
+                      <div className={styles.userDetails}>
+                        <span className={styles.userNameLarge}>
                           {userDetails?.name || "User"}
                         </span>
-                        <span className="user-email">{userDetails?.email}</span>
+                        <span className={styles.userEmail}>
+                          {userDetails?.email}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="dropdown-divider"></div>
+                    <div className={styles.dropdownDivider}></div>
 
                     <Link
-                      className="dropdown-item"
+                      className={styles.dropdownItem}
                       to="/manage-payments"
-                      onClick={() => setIsDropdownOpen(false)}
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        closeMobileMenu();
+                      }}
                     >
-                      <FaCreditCard className="dropdown-icon" />
+                      <FaCreditCard className={styles.dropdownIcon} />
                       Manage Payments
                     </Link>
 
                     <Can permission="canViewUser">
                       <Link
-                        className="dropdown-item"
+                        className={styles.dropdownItem}
                         to="/users"
-                        onClick={() => setIsDropdownOpen(false)}
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          closeMobileMenu();
+                        }}
                       >
-                        <FaUsers className="dropdown-icon" />
+                        <FaUsers className={styles.dropdownIcon} />
                         Manage Users
                       </Link>
                     </Can>
 
                     <Link
-                      className="dropdown-item"
+                      className={styles.dropdownItem}
                       to="#"
                       onClick={() => {
                         handleResetPassword();
                         setIsDropdownOpen(false);
+                        closeMobileMenu();
                       }}
                     >
-                      <FaKey className="dropdown-icon" />
+                      <FaKey className={styles.dropdownIcon} />
                       Reset Password
                     </Link>
 
-                    <div className="dropdown-divider"></div>
+                    <div className={styles.dropdownDivider}></div>
 
                     <Link
-                      className="dropdown-item text-danger"
+                      className={`${styles.dropdownItem} text-danger`}
                       to="/logout"
-                      onClick={() => setIsDropdownOpen(false)}
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        closeMobileMenu();
+                      }}
                     >
-                      <FaSignOutAlt className="dropdown-icon" />
+                      <FaSignOutAlt className={styles.dropdownIcon} />
                       Logout
                     </Link>
                   </div>
@@ -213,349 +244,6 @@ function UserHeader() {
           </div>
         </div>
       </nav>
-
-      <style jsx>{`
-        .user-header {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 1000;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .user-header.scrolled {
-          background: rgba(255, 255, 255, 0.98);
-          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar {
-          padding: 1rem 0;
-        }
-
-        .brand-container {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .brand-icon {
-          font-size: 1.5rem;
-          color: #667eea;
-        }
-
-        .brand-text {
-          font-size: 1.5rem;
-          font-weight: 700;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .navbar-nav .nav-link {
-          color: #495057;
-          font-weight: 500;
-          padding: 0.5rem 1rem;
-          margin: 0 0.25rem;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-          position: relative;
-        }
-
-        .navbar-nav .nav-link:hover {
-          color: #667eea;
-          background: rgba(102, 126, 234, 0.1);
-        }
-
-        .navbar-nav .nav-link.active {
-          color: #667eea;
-          background: rgba(102, 126, 234, 0.1);
-        }
-
-        .navbar-nav .nav-link.active::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 20px;
-          height: 2px;
-          background: #667eea;
-          border-radius: 1px;
-        }
-
-        .search-container {
-          position: relative;
-        }
-
-        .search-input-wrapper {
-          position: relative;
-          display: flex;
-          align-items: center;
-        }
-
-        .search-icon {
-          position: absolute;
-          left: 12px;
-          color: #6c757d;
-          font-size: 0.875rem;
-        }
-
-        .search-input {
-          padding: 0.5rem 1rem 0.5rem 2.5rem;
-          border: 1px solid #dee2e6;
-          border-radius: 20px;
-          background: #f8f9fa;
-          font-size: 0.875rem;
-          width: 200px;
-          transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-          outline: none;
-          border-color: #667eea;
-          background: white;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .notification-icon {
-          position: relative;
-          color: #6c757d;
-          font-size: 1.1rem;
-          cursor: pointer;
-          padding: 0.5rem;
-          border-radius: 50%;
-          transition: all 0.3s ease;
-        }
-
-        .notification-icon:hover {
-          background: rgba(102, 126, 234, 0.1);
-          color: #667eea;
-        }
-
-        .notification-badge {
-          position: absolute;
-          top: 0;
-          right: 0;
-          background: #e74c3c;
-          color: white;
-          font-size: 0.7rem;
-          padding: 0.1rem 0.3rem;
-          border-radius: 10px;
-          min-width: 18px;
-          text-align: center;
-        }
-
-        .user-dropdown {
-          position: relative;
-        }
-
-        .user-dropdown-toggle {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          background: none;
-          border: none;
-          padding: 0.5rem;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .user-dropdown-toggle:hover {
-          background: rgba(102, 126, 234, 0.1);
-        }
-
-        .user-avatar {
-          width: 35px;
-          height: 35px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 0.875rem;
-        }
-
-        .user-info {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .user-name {
-          font-weight: 600;
-          color: #495057;
-          font-size: 0.875rem;
-        }
-
-        .user-role {
-          font-size: 0.75rem;
-          color: #6c757d;
-          text-transform: capitalize;
-        }
-
-        .dropdown-menu {
-          position: absolute;
-          top: 100%;
-          right: 0;
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-          border: 1px solid rgba(0, 0, 0, 0.05);
-          min-width: 250px;
-          padding: 0;
-          margin-top: 0.5rem;
-          z-index: 1000;
-        }
-
-        .dropdown-header {
-          padding: 1rem;
-          border-bottom: 1px solid #f1f3f4;
-        }
-
-        .user-avatar-large {
-          width: 50px;
-          height: 50px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 1.25rem;
-          margin-bottom: 0.75rem;
-        }
-
-        .user-details {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .user-name-large {
-          font-weight: 600;
-          color: #495057;
-          font-size: 1rem;
-        }
-
-        .user-email {
-          font-size: 0.875rem;
-          color: #6c757d;
-        }
-
-        .dropdown-divider {
-          height: 1px;
-          background: #f1f3f4;
-          margin: 0.5rem 0;
-        }
-
-        .dropdown-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1rem;
-          color: #495057;
-          text-decoration: none;
-          transition: all 0.3s ease;
-          font-size: 0.875rem;
-        }
-
-        .dropdown-item:hover {
-          background: #f8f9fa;
-          color: #667eea;
-        }
-
-        .dropdown-item.text-danger:hover {
-          background: #fee;
-          color: #dc3545;
-        }
-
-        .dropdown-icon {
-          font-size: 1rem;
-          width: 16px;
-        }
-
-        .mobile-menu-btn {
-          border: none;
-          background: none;
-          color: #495057;
-          font-size: 1.25rem;
-          padding: 0.5rem;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-        }
-
-        .mobile-menu-btn:hover {
-          background: rgba(102, 126, 234, 0.1);
-          color: #667eea;
-        }
-
-        /* Mobile Styles */
-        @media (max-width: 991.98px) {
-          .navbar-collapse {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-top: 1rem;
-            padding: 1rem;
-          }
-
-          .navbar-nav .nav-link {
-            padding: 0.75rem 1rem;
-            margin: 0.25rem 0;
-          }
-
-          .navbar-nav .nav-link.active::after {
-            display: none;
-          }
-
-          .search-container {
-            margin: 1rem 0;
-          }
-
-          .search-input {
-            width: 100%;
-          }
-
-          .notification-icon {
-            margin: 1rem 0;
-          }
-
-          .user-dropdown {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-          }
-
-          .dropdown-menu {
-            position: static;
-            box-shadow: none;
-            border: none;
-            margin-top: 1rem;
-          }
-        }
-
-        /* Animation for mobile menu */
-        .navbar-collapse.show {
-          animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </header>
   );
 }

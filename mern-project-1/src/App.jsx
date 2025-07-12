@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
 import AppLayout from "./layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import { useEffect, useState } from "react";
@@ -11,7 +10,6 @@ import { serverEndpoint } from "./config/config";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_USER } from "./redux/user/actions";
 import UserLayout from "./layout/UserLayout";
-import Register from "./pages/Register";
 import { Spinner } from "react-bootstrap";
 import ManageUsers from "./pages/users/ManageUsers";
 import UnauthorizedAccess from "./components/UnauthorizedAccess";
@@ -71,30 +69,12 @@ function App() {
           )
         }
       />
-      <Route
-        path="/login"
-        element={
-          userDetails ? (
-            <Navigate to="/dashboard" />
-          ) : (
-            <AppLayout>
-              <Login />
-            </AppLayout>
-          )
-        }
-      />
+      <Route path="/login" element={<Navigate to="/?modal=login" replace />} />
       <Route
         path="/register"
-        element={
-          userDetails ? (
-            <Navigate to="/dashboard" />
-          ) : (
-            <AppLayout>
-              <Register />
-            </AppLayout>
-          )
-        }
+        element={<Navigate to="/?modal=register" replace />}
       />
+      {/* Removed /login and /register routes */}
       <Route
         path="/dashboard"
         element={
@@ -103,14 +83,14 @@ function App() {
               <Dashboard />
             </UserLayout>
           ) : (
-            <Navigate to="/login" />
+            <Navigate to="/" />
           )
         }
       />
 
       <Route
         path="/logout"
-        element={userDetails ? <Logout /> : <Navigate to="/login" />}
+        element={userDetails ? <Logout /> : <Navigate to="/" />}
       />
 
       <Route
@@ -137,7 +117,7 @@ function App() {
               </UserLayout>
             </ProtectedRoute>
           ) : (
-            <Navigate to="/login" />
+            <Navigate to="/" />
           )
         }
       />
@@ -149,7 +129,7 @@ function App() {
               <UnauthorizedAccess />
             </UserLayout>
           ) : (
-            <Navigate to="/login" />
+            <Navigate to="/" />
           )
         }
       />
@@ -163,7 +143,7 @@ function App() {
               </UserLayout>
             </ProtectedRoute>
           ) : (
-            <Navigate to="/login" />
+            <Navigate to="/" />
           )
         }
       />
@@ -175,7 +155,7 @@ function App() {
               <AnalyticsDashboard />
             </UserLayout>
           ) : (
-            <Navigate to="/login" />
+            <Navigate to="/" />
           )
         }
       />

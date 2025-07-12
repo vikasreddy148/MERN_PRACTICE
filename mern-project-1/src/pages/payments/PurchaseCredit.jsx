@@ -4,8 +4,9 @@ import { useState } from "react";
 import axios from "axios";
 import { serverEndpoint } from "../../config/config";
 import { SET_USER } from "../../redux/user/actions";
-import "./PurchaseCredit.css";
-import { Modal } from "react-bootstrap";
+import styles from "./PurchaseCredit.module.css";
+import modalStyles from "./PurchaseCreditModal.module.css";
+import Modal from "../../components/Modal";
 
 function PurchaseCredit() {
   const dispatch = useDispatch();
@@ -117,7 +118,10 @@ function PurchaseCredit() {
   };
 
   return (
-    <section className="ezy__pricing10 light py-5" id="ezy__pricing10">
+    <section
+      className={styles.ezy__pricing10 + " light py-5"}
+      id="ezy__pricing10"
+    >
       <div className="container">
         {errors.message && (
           <div className="alert alert-danger">{errors.message}</div>
@@ -126,15 +130,15 @@ function PurchaseCredit() {
 
         <div className="d-flex justify-content-between align-items-start w-100">
           <div className="text-left">
-            <h3 className="ezy__pricing10-heading">Choose Plan</h3>
-            <p className="ezy__pricing10-sub-heading mt-3">
+            <h3 className={styles.ezy__pricing10_heading}>Choose Plan</h3>
+            <p className={styles.ezy__pricing10_sub_heading + " mt-3"}>
               Flexible options: one-time credits or recurring subscriptions.
             </p>
           </div>
 
           <div className="text-right">
             <h3>Current Balance</h3>
-            <p className="ezy__pricing10-sub-heading mt-3">
+            <p className={styles.ezy__pricing10_sub_heading + " mt-3"}>
               {userDetails.credits} Credits
             </p>
           </div>
@@ -143,14 +147,24 @@ function PurchaseCredit() {
         <div className="row">
           {/* Credit Pack Card */}
           <div className="col-md-6 col-xl-4 mt-4 text-center">
-            <div className="card ezy__pricing10-card p-4 border-0 rounded-0">
+            <div
+              className={
+                "card " + styles.ezy__pricing10_card + " p-4 border-0 rounded-0"
+              }
+            >
               <div className="card-body pt-4">
-                <p className="ezy__pricing10-meta-price">
-                  <span className="ezy__pricing10-rate">Credit Packs</span>
+                <p className={styles.ezy__pricing10_meta_price}>
+                  <span className={styles.ezy__pricing10_rate}>
+                    Credit Packs
+                  </span>
                 </p>
               </div>
               <div className="card-body pb-4 p-0">
-                <ul className="nav ezy__pricing10-nav flex-column">
+                <ul
+                  className={
+                    "nav " + styles.ezy__pricing10_nav + " flex-column"
+                  }
+                >
                   {CREDIT_PACKS.map((c) => (
                     <li className="pb-2" key={c}>
                       {c} CREDITS FOR ₹{c}
@@ -169,14 +183,22 @@ function PurchaseCredit() {
 
           {/* Monthly Plan */}
           <div className="col-md-6 col-xl-4 mt-4 text-center">
-            <div className="card ezy__pricing10-card p-4 border-0 rounded-0">
+            <div
+              className={
+                "card " + styles.ezy__pricing10_card + " p-4 border-0 rounded-0"
+              }
+            >
               <div className="card-body pt-4">
-                <p className="ezy__pricing10-meta-price">
-                  <span className="ezy__pricing10-rate">₹199/month</span>
+                <p className={styles.ezy__pricing10_meta_price}>
+                  <span className={styles.ezy__pricing10_rate}>₹199/month</span>
                 </p>
               </div>
               <div className="card-body pb-4 p-0">
-                <ul className="nav ezy__pricing10-nav flex-column">
+                <ul
+                  className={
+                    "nav " + styles.ezy__pricing10_nav + " flex-column"
+                  }
+                >
                   {pricingList[1].list.map((item, i) => (
                     <li className="pb-2" key={i}>
                       {item.detail}
@@ -195,14 +217,22 @@ function PurchaseCredit() {
 
           {/* Yearly Plan */}
           <div className="col-md-6 col-xl-4 mt-4 text-center">
-            <div className="card ezy__pricing10-card p-4 border-0 rounded-0">
+            <div
+              className={
+                "card " + styles.ezy__pricing10_card + " p-4 border-0 rounded-0"
+              }
+            >
               <div className="card-body pt-4">
-                <p className="ezy__pricing10-meta-price">
-                  <span className="ezy__pricing10-rate">₹1990/year</span>
+                <p className={styles.ezy__pricing10_meta_price}>
+                  <span className={styles.ezy__pricing10_rate}>₹1990/year</span>
                 </p>
               </div>
               <div className="card-body pb-4 p-0">
-                <ul className="nav ezy__pricing10-nav flex-column">
+                <ul
+                  className={
+                    "nav " + styles.ezy__pricing10_nav + " flex-column"
+                  }
+                >
                   {pricingList[2].list.map((item, i) => (
                     <li className="pb-2" key={i}>
                       {item.detail}
@@ -220,22 +250,22 @@ function PurchaseCredit() {
           </div>
         </div>
 
-        {/* React-Bootstrap Modal */}
-        <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Buy Credits</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="text-center">
-            {CREDIT_PACKS.map((c) => (
-              <button
-                key={c}
-                className="m-2 btn btn-outline-primary"
-                onClick={() => handleBuyCredits(c)}
-              >
-                Buy {c} Credits
-              </button>
-            ))}
-          </Modal.Body>
+        {/* Modern Modal for Buy Credits */}
+        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+          <div className={modalStyles.modalContent}>
+            <h2 className={modalStyles.heading}>Buy Credits</h2>
+            <div className={modalStyles.creditOptions}>
+              {CREDIT_PACKS.map((c) => (
+                <button
+                  key={c}
+                  className={modalStyles.creditBtn}
+                  onClick={() => handleBuyCredits(c)}
+                >
+                  Buy {c} Credits
+                </button>
+              ))}
+            </div>
+          </div>
         </Modal>
       </div>
     </section>

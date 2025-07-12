@@ -1,0 +1,125 @@
+.modalContent {
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  min-width: 320px;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.heading {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #4b4b6b;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.formGroup label {
+  font-weight: 500;
+  color: #333;
+}
+
+.formGroup input,
+.formGroup select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+
+.invalid {
+  border-color: #e74c3c !important;
+}
+
+.invalidFeedback {
+  color: #e74c3c;
+  font-size: 0.9rem;
+}
+
+.submitBtn {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.submitBtn:hover {
+  background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.actionBtn {
+  background: #f8f9fa;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.editBtn {
+  color: #667eea;
+}
+
+.editBtn:hover {
+  background: #e9ecef;
+  color: #4b4b6b;
+}
+
+.deleteBtn {
+  color: #e74c3c;
+}
+
+.deleteBtn:hover {
+  background: #ffeaea;
+  color: #c0392b;
+}
+
+.addBtn {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.addBtn:hover {
+  background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.03);
+}

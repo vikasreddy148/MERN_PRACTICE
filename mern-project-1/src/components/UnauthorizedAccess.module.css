@@ -1,0 +1,32 @@
+.container {
+  min-height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  padding: 1.5rem;
+}
+
+.icon {
+  font-size: 48px;
+  color: #dc3545;
+}
+
+.title {
+  margin-top: 0.5rem;
+  color: #dc3545;
+}
+
+.description {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+.button {
+  width: 100%;
+}

@@ -1,11 +1,11 @@
 import IconButton from "@mui/material/IconButton";
 import { DataGrid } from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { FaEdit, FaTrash, FaUserPlus } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { serverEndpoint } from "../../config/config";
-import { Modal } from "react-bootstrap";
+import Modal from "../../components/Modal";
+import styles from "./ManageUsersModal.module.css";
 
 const USER_ROLES = ["viewer", "developer"];
 
@@ -179,14 +179,22 @@ function ManageUsers() {
       headerName: "Action",
       flex: 1,
       renderCell: (params) => (
-        <>
-          <IconButton>
-            <EditIcon onClick={() => handleModalShow(true, params.row)} />
-          </IconButton>
-          <IconButton>
-            <DeleteIcon onClick={() => handleDeleteModalShow(params.row._id)} />
-          </IconButton>
-        </>
+        <div className={styles.actionButtons}>
+          <button
+            className={styles.actionBtn + " " + styles.editBtn}
+            onClick={() => handleModalShow(true, params.row)}
+            title="Edit user"
+          >
+            <FaEdit />
+          </button>
+          <button
+            className={styles.actionBtn + " " + styles.deleteBtn}
+            onClick={() => handleDeleteModalShow(params.row._id)}
+            title="Delete user"
+          >
+            <FaTrash />
+          </button>
+        </div>
       ),
     },
   ];
@@ -196,10 +204,10 @@ function ManageUsers() {
       <div className="d-flex justify-content-between mb-3">
         <h2>Manage Users</h2>
         <button
-          className="btn btn-primary btn-sm"
+          className={styles.addBtn}
           onClick={() => handleModalShow(false)}
         >
-          Add
+          <FaUserPlus className="me-2" /> Add
         </button>
       </div>
 
@@ -229,59 +237,51 @@ function ManageUsers() {
         />
       </div>
 
-      <Modal show={showModal} onHide={handleModalClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>{isEdit ? <>Edit User</> : <>Add User</>}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label">
-                Email
-              </label>
+      {/* Add/Edit User Modal */}
+      <Modal isOpen={showModal} onClose={handleModalClose}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.heading}>
+            {isEdit ? "Edit User" : "Add User"}
+          </h2>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.formGroup}>
+              <label htmlFor="email">Email</label>
               <input
                 type="text"
-                className={`form-control ${errors.email ? "is-invalid" : ""}`}
                 id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                className={errors.email ? styles.invalid : ""}
               />
               {errors.email && (
-                <div className="invalid-feedback">{errors.email}</div>
+                <div className={styles.invalidFeedback}>{errors.email}</div>
               )}
             </div>
-
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">
-                Name
-              </label>
+            <div className={styles.formGroup}>
+              <label htmlFor="name">Name</label>
               <input
                 type="text"
-                className={`form-control ${errors.name ? "is-invalid" : ""}`}
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                className={errors.name ? styles.invalid : ""}
               />
               {errors.name && (
-                <div className="invalid-feedback">{errors.name}</div>
+                <div className={styles.invalidFeedback}>{errors.name}</div>
               )}
             </div>
-
-            <div className="mb-3">
-              <label htmlFor="role" className="form-label">
-                Role
-              </label>
+            <div className={styles.formGroup}>
+              <label htmlFor="role">Role</label>
               <select
+                id="role"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className={`form-control ${errors.role ? "is-invalid" : ""}`}
+                className={errors.role ? styles.invalid : ""}
               >
-                <option key="select" value="">
-                  Select
-                </option>
+                <option value="">Select Role</option>
                 {USER_ROLES.map((role) => (
                   <option key={role} value={role}>
                     {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -289,59 +289,50 @@ function ManageUsers() {
                 ))}
               </select>
               {errors.role && (
-                <div className="invalid-feedback">{errors.role}</div>
+                <div className={styles.invalidFeedback}>{errors.role}</div>
               )}
             </div>
-
-            <div className="d-grid">
-              {formLoading ? (
-                <button className="btn btn-primary" type="button" disabled="">
-                  <span
-                    className="spinner-border spinner-border-sm"
-                    aria-hidden="true"
-                  />
-                  <span className="visually-hidden" role="status">
-                    Loading...
-                  </span>
-                </button>
-              ) : (
-                <button type="submit" className="btn btn-primary">
-                  Submit
-                </button>
-              )}
-            </div>
+            <button
+              type="submit"
+              className={styles.submitBtn}
+              disabled={formLoading}
+            >
+              {isEdit ? "Update User" : "Add User"}
+            </button>
           </form>
-        </Modal.Body>
+        </div>
       </Modal>
 
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal()}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this link?</Modal.Body>
-        <Modal.Footer>
-          <button
-            className="btn btn-secondary"
-            onClick={() => setShowDeleteModal()}
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={showDeleteModal} onClose={handleDeleteModalClose}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.heading}>Confirm Delete</h2>
+          <div
+            style={{ margin: "1.5rem 0", textAlign: "center", color: "#333" }}
           >
-            Cancel
-          </button>
-          {formLoading ? (
-            <button className="btn btn-danger" type="button" disabled="">
-              <span
-                className="spinner-border spinner-border-sm"
-                aria-hidden="true"
-              />
-              <span className="visually-hidden" role="status">
-                Loading...
-              </span>
+            Are you sure you want to delete this user? This action cannot be
+            undone.
+          </div>
+          <div
+            style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}
+          >
+            <button
+              className={styles.submitBtn}
+              style={{ background: "#ccc", color: "#333" }}
+              onClick={handleDeleteModalClose}
+            >
+              Cancel
             </button>
-          ) : (
-            <button className="btn btn-danger" onClick={handleDeleteSubmit}>
+            <button
+              className={styles.submitBtn}
+              style={{ background: "#e74c3c" }}
+              onClick={handleDeleteSubmit}
+              disabled={formLoading}
+            >
               Delete
             </button>
-          )}
-        </Modal.Footer>
+          </div>
+        </div>
       </Modal>
     </div>
   );

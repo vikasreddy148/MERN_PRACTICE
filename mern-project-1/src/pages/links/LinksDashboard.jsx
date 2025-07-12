@@ -6,7 +6,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { serverEndpoint } from "../../config/config";
-import { Modal } from "react-bootstrap";
+import Modal from "../../components/Modal";
 import { usePermission } from "../../rbac/usersPermissions";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,6 +19,7 @@ import {
   FaCopy,
   FaExternalLinkAlt,
 } from "react-icons/fa";
+import styles from "./LinkModal.module.css";
 
 function LinksDashboard() {
   const [errors, setErrors] = useState({});
@@ -62,14 +63,20 @@ function LinksDashboard() {
         originalUrl: data.originalUrl,
         category: data.category,
       });
+    } else {
+      setFormData({
+        campaignTitle: "",
+        originalUrl: "",
+        category: "",
+      });
     }
-
     setIsEdit(isEdit);
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
+    setErrors({});
   };
 
   const [formData, setFormData] = useState({
@@ -383,95 +390,97 @@ function LinksDashboard() {
       </div>
 
       {/* Add/Edit Modal */}
-      <Modal show={showModal} onHide={handleCloseModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>{isEdit ? "Edit Link" : "Add New Link"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
+      <Modal isOpen={showModal} onClose={handleCloseModal}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.heading}>
+            {isEdit ? "Edit Link" : "Add New Link"}
+          </h2>
+          {errors.message && (
+            <div className={styles.errorAlert}>{errors.message}</div>
+          )}
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.formGroup}>
               <label htmlFor="campaignTitle">Campaign Title</label>
               <input
                 type="text"
-                className={`form-control ${
-                  errors.campaignTitle ? "is-invalid" : ""
-                }`}
                 id="campaignTitle"
                 name="campaignTitle"
                 value={formData.campaignTitle}
                 onChange={handleChange}
-                placeholder="Enter campaign title"
+                className={errors.campaignTitle ? styles.invalid : ""}
               />
               {errors.campaignTitle && (
-                <div className="invalid-feedback">{errors.campaignTitle}</div>
+                <div className={styles.invalidFeedback}>
+                  {errors.campaignTitle}
+                </div>
               )}
             </div>
-            <div className="form-group">
-              <label htmlFor="originalUrl">Original URL</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="originalUrl">URL</label>
               <input
-                type="url"
-                className={`form-control ${
-                  errors.originalUrl ? "is-invalid" : ""
-                }`}
+                type="text"
                 id="originalUrl"
                 name="originalUrl"
                 value={formData.originalUrl}
                 onChange={handleChange}
-                placeholder="https://example.com"
+                className={errors.originalUrl ? styles.invalid : ""}
               />
               {errors.originalUrl && (
-                <div className="invalid-feedback">{errors.originalUrl}</div>
+                <div className={styles.invalidFeedback}>
+                  {errors.originalUrl}
+                </div>
               )}
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label htmlFor="category">Category</label>
               <input
                 type="text"
-                className={`form-control ${
-                  errors.category ? "is-invalid" : ""
-                }`}
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                placeholder="Enter category"
+                className={errors.category ? styles.invalid : ""}
               />
               {errors.category && (
-                <div className="invalid-feedback">{errors.category}</div>
+                <div className={styles.invalidFeedback}>{errors.category}</div>
               )}
             </div>
+            <button type="submit" className={styles.submitBtn}>
+              {isEdit ? "Update Link" : "Add Link"}
+            </button>
           </form>
-        </Modal.Body>
-        <Modal.Footer>
-          <button className="btn btn-secondary" onClick={handleCloseModal}>
-            Cancel
-          </button>
-          <button className="btn btn-primary" onClick={handleSubmit}>
-            {isEdit ? "Update" : "Create"}
-          </button>
-        </Modal.Footer>
+        </div>
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this link? This action cannot be
-          undone.
-        </Modal.Body>
-        <Modal.Footer>
-          <button
-            className="btn btn-secondary"
-            onClick={handleCloseDeleteModal}
+      <Modal isOpen={showDeleteModal} onClose={handleCloseDeleteModal}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.heading}>Confirm Delete</h2>
+          <div
+            style={{ margin: "1.5rem 0", textAlign: "center", color: "#333" }}
           >
-            Cancel
-          </button>
-          <button className="btn btn-danger" onClick={handleDelete}>
-            Delete
-          </button>
-        </Modal.Footer>
+            Are you sure you want to delete this link? This action cannot be
+            undone.
+          </div>
+          <div
+            style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}
+          >
+            <button
+              className={styles.submitBtn}
+              style={{ background: "#ccc", color: "#333" }}
+              onClick={handleCloseDeleteModal}
+            >
+              Cancel
+            </button>
+            <button
+              className={styles.submitBtn}
+              style={{ background: "#e74c3c" }}
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       </Modal>
 
       <style jsx>{`
