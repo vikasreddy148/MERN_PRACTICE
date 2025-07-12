@@ -1,0 +1,78 @@
+.fullScreenOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+}
+
+.fullScreenContent {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border-radius: inherit;
+}
+
+.overlayContent {
+  text-align: center;
+  padding: 1rem;
+}
+
+.inlineSpinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loadingText {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.fullScreenContent .loadingText {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .fullScreenOverlay {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .fullScreenContent {
+    background: #2d3748;
+    color: white;
+  }
+
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  .loadingText {
+    color: #a0aec0;
+  }
+}

@@ -5,6 +5,9 @@ import { serverEndpoint } from "../config/config";
 import { useDispatch } from "react-redux";
 import { SET_USER } from "../redux/user/actions";
 import Modal from "./Modal";
+import LoadingButton from "./LoadingButton";
+import LoadingSpinner from "./LoadingSpinner";
+import { toast } from "react-toastify";
 import styles from "./LoginRegisterModal.module.css";
 
 function LoginModal({ isOpen, onClose }) {
@@ -14,6 +17,8 @@ function LoginModal({ isOpen, onClose }) {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleChange = (e) => {
     const name = e.target.name;
@@ -39,6 +44,7 @@ function LoginModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
+      setIsSubmitting(true);
       const body = {
         username: formData.username,
         password: formData.password,
@@ -51,14 +57,22 @@ function LoginModal({ isOpen, onClose }) {
           config
         );
         dispatch({ type: SET_USER, payload: response.data.user });
+        toast.success("Login successful! Welcome back.");
         onClose();
       } catch (error) {
-        setErrors({ message: "Something went wrong, please try again" });
+        const errorMessage =
+          error.response?.data?.message ||
+          "Login failed. Please check your credentials.";
+        setErrors({ message: errorMessage });
+        toast.error(errorMessage);
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
 
   const handleGoogleSuccess = async (authResponse) => {
+    setIsGoogleLoading(true);
     try {
       const response = await axios.post(
         `${serverEndpoint}/auth/google-auth`,
@@ -66,9 +80,15 @@ function LoginModal({ isOpen, onClose }) {
         { withCredentials: true }
       );
       dispatch({ type: SET_USER, payload: response.data.user });
+      toast.success("Google login successful! Welcome back.");
       onClose();
     } catch (error) {
-      setErrors({ message: "Error processing Google auth, please try again" });
+      const errorMessage =
+        "Error processing Google authentication. Please try again.";
+      setErrors({ message: errorMessage });
+      toast.error(errorMessage);
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -116,18 +136,29 @@ function LoginModal({ isOpen, onClose }) {
               <div className={styles.invalidFeedback}>{errors.password}</div>
             )}
           </div>
-          <button type="submit" className={styles.submitBtn}>
+          <LoadingButton
+            type="submit"
+            className={styles.submitBtn}
+            loading={isSubmitting}
+            loadingText="Signing In..."
+          >
             Sign In
-          </button>
+          </LoadingButton>
         </form>
         <div className={styles.orDivider}>
           <span>OR</span>
         </div>
         <div className={styles.googleLoginWrapper}>
+          {isGoogleLoading && (
+            <div className={styles.googleLoadingOverlay}>
+              <LoadingSpinner text="Processing Google login..." />
+            </div>
+          )}
           <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
+              disabled={isGoogleLoading}
             />
           </GoogleOAuthProvider>
         </div>

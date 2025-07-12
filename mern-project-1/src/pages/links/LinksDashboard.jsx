@@ -7,8 +7,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { serverEndpoint } from "../../config/config";
 import Modal from "../../components/Modal";
+import LoadingButton from "../../components/LoadingButton";
+import SkeletonLoader from "../../components/SkeletonLoader";
 import { usePermission } from "../../rbac/usersPermissions";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   FaPlus,
   FaLink,
@@ -30,6 +33,8 @@ function LinksDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const permission = usePermission();
 
   const handleShowDeleteModal = (linkId) => {
@@ -44,14 +49,20 @@ function LinksDashboard() {
   };
 
   const handleDelete = async () => {
+    setIsDeleting(true);
     try {
       await axios.delete(`${serverEndpoint}/links/${formData.id}`, {
         withCredentials: true,
       });
       await fetchLinks();
+      toast.success("Link deleted successfully!");
       handleCloseDeleteModal();
     } catch (error) {
-      setErrors({ message: "Unable to delete the link, please try again" });
+      const errorMessage = "Unable to delete the link. Please try again.";
+      setErrors({ message: errorMessage });
+      toast.error(errorMessage);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -121,6 +132,7 @@ function LinksDashboard() {
     event.preventDefault();
 
     if (validate()) {
+      setIsSubmitting(true);
       const body = {
         campaign_title: formData.campaignTitle,
         original_url: formData.originalUrl,
@@ -136,8 +148,10 @@ function LinksDashboard() {
             body,
             configuration
           );
+          toast.success("Link updated successfully!");
         } else {
           await axios.post(`${serverEndpoint}/links`, body, configuration);
+          toast.success("Link created successfully!");
         }
 
         await fetchLinks();
@@ -147,8 +161,11 @@ function LinksDashboard() {
           category: "",
         });
       } catch (error) {
-        setErrors({ message: "Unable to add the Link, please try again" });
+        const errorMessage = "Unable to save the link. Please try again.";
+        setErrors({ message: errorMessage });
+        toast.error(errorMessage);
       } finally {
+        setIsSubmitting(false);
         handleCloseModal();
       }
     }
@@ -173,7 +190,7 @@ function LinksDashboard() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    // You could add a toast notification here
+    toast.success("Link copied to clipboard!");
   };
 
   useEffect(() => {
@@ -358,35 +375,39 @@ function LinksDashboard() {
 
       {/* Data Grid */}
       <div className="data-grid-container">
-        <DataGrid
-          getRowId={(row) => row._id}
-          rows={linksData}
-          columns={columns}
-          loading={loading}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 20, page: 0 },
-            },
-          }}
-          pageSizeOptions={[20, 50, 100]}
-          disableRowSelectionOnClick
-          showToolbar
-          sx={{
-            fontFamily: "inherit",
-            border: "none",
-            "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid #f0f0f0",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#f8f9fa",
-              borderBottom: "2px solid #e9ecef",
-            },
-            "& .MuiDataGrid-row:hover": {
-              backgroundColor: "#f8f9fa",
-            },
-          }}
-          density="comfortable"
-        />
+        {loading ? (
+          <SkeletonLoader type="table" rows={8} columns={5} height={60} />
+        ) : (
+          <DataGrid
+            getRowId={(row) => row._id}
+            rows={linksData}
+            columns={columns}
+            loading={loading}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 20, page: 0 },
+              },
+            }}
+            pageSizeOptions={[20, 50, 100]}
+            disableRowSelectionOnClick
+            showToolbar
+            sx={{
+              fontFamily: "inherit",
+              border: "none",
+              "& .MuiDataGrid-cell": {
+                borderBottom: "1px solid #f0f0f0",
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f8f9fa",
+                borderBottom: "2px solid #e9ecef",
+              },
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "#f8f9fa",
+              },
+            }}
+            density="comfortable"
+          />
+        )}
       </div>
 
       {/* Add/Edit Modal */}
@@ -445,9 +466,14 @@ function LinksDashboard() {
                 <div className={styles.invalidFeedback}>{errors.category}</div>
               )}
             </div>
-            <button type="submit" className={styles.submitBtn}>
+            <LoadingButton
+              type="submit"
+              className={styles.submitBtn}
+              loading={isSubmitting}
+              loadingText={isEdit ? "Updating..." : "Creating..."}
+            >
               {isEdit ? "Update Link" : "Add Link"}
-            </button>
+            </LoadingButton>
           </form>
         </div>
       </Modal>
@@ -472,13 +498,15 @@ function LinksDashboard() {
             >
               Cancel
             </button>
-            <button
+            <LoadingButton
               className={styles.submitBtn}
               style={{ background: "#e74c3c" }}
               onClick={handleDelete}
+              loading={isDeleting}
+              loadingText="Deleting..."
             >
               Delete
-            </button>
+            </LoadingButton>
           </div>
         </div>
       </Modal>
