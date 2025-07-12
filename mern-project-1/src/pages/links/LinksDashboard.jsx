@@ -234,8 +234,7 @@ function LinksDashboard() {
     {
       field: "action",
       headerName: "Actions",
-      flex: 2,
-      minWidth: 200,
+      flex: 1.5,
       renderCell: (params) => (
         <div className="action-buttons">
           {permission.canEditLink && (
@@ -551,7 +550,7 @@ function LinksDashboard() {
         }
 
         .stat-card {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: white;
           border-radius: 12px;
           padding: 1.5rem;
           display: flex;
@@ -559,7 +558,6 @@ function LinksDashboard() {
           gap: 1rem;
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
           transition: transform 0.3s ease;
-          color: #fff !important;
         }
 
         .stat-card:hover {
@@ -569,25 +567,24 @@ function LinksDashboard() {
         .stat-icon {
           width: 50px;
           height: 50px;
-          background: white;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #667eea;
+          color: white;
           font-size: 1.25rem;
-          color: #fff !important;
         }
 
         .stat-number {
           font-size: 1.75rem;
           font-weight: 700;
-          color: #fff !important;
+          color: #2c3e50;
           line-height: 1;
         }
 
         .stat-label {
-          color: #fff !important;
+          color: #6c757d;
           font-size: 0.875rem;
           margin-top: 0.25rem;
         }
@@ -704,9 +701,6 @@ function LinksDashboard() {
         .action-buttons {
           display: flex;
           gap: 0.5rem;
-          flex-wrap: nowrap;
-          min-width: 180px;
-          white-space: nowrap;
         }
 
         .action-btn {
@@ -736,16 +730,11 @@ function LinksDashboard() {
         }
 
         .view-btn {
-          color: #fff !important;
-          background: #4facfe !important;
-          border-radius: 6px;
-          font-size: 1.1rem;
-          box-shadow: 0 2px 8px rgba(79, 172, 254, 0.15);
+          color: #17a2b8;
         }
 
         .view-btn:hover {
-          background: #667eea !important;
-          color: #fff !important;
+          background: #d1ecf1;
         }
 
         /* Responsive Design */
@@ -766,12 +755,6 @@ function LinksDashboard() {
 
           .dashboard-title {
             font-size: 1.5rem;
-          }
-        }
-        @media (max-width: 900px) {
-          .data-grid-container {
-            overflow-x: auto;
-            min-width: 400px;
           }
         }
       `}</style>

@@ -50,11 +50,7 @@ function UserHeader() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header
-      className={`user-header ${isScrolled ? "scrolled" : ""} ${
-        isMobileMenuOpen ? "menu-open" : ""
-      }`}
-    >
+    <header className={`user-header ${isScrolled ? "scrolled" : ""}`}>
       <nav className="navbar navbar-expand-lg">
         <div className="container">
           {/* Logo */}
@@ -64,6 +60,7 @@ function UserHeader() {
               <span className="brand-text">Affiliate++</span>
             </div>
           </Link>
+
           {/* Mobile Menu Button */}
           <button
             className="navbar-toggler mobile-menu-btn"
@@ -73,13 +70,7 @@ function UserHeader() {
           >
             {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
-          {/* Overlay for mobile menu */}
-          {isMobileMenuOpen && (
-            <div
-              className="mobile-menu-overlay"
-              onClick={() => setIsMobileMenuOpen(false)}
-            ></div>
-          )}
+
           {/* Navigation Menu */}
           <div className={`navbar-collapse ${isMobileMenuOpen ? "show" : ""}`}>
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
@@ -563,54 +554,6 @@ function UserHeader() {
             opacity: 1;
             transform: translateY(0);
           }
-        }
-        .mobile-menu-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(0, 0, 0, 0.3);
-          z-index: 999;
-          display: block;
-        }
-        .menu-open {
-          overflow: hidden;
-        }
-        @media (max-width: 991.98px) {
-          .navbar-collapse {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 80vw;
-            max-width: 350px;
-            height: 100vh;
-            background: #fff;
-            border-radius: 0 0 0 16px;
-            box-shadow: -2px 0 30px rgba(0, 0, 0, 0.15);
-            margin-top: 0;
-            padding: 2rem 1.5rem 1.5rem 1.5rem;
-            z-index: 1001;
-            transform: translateX(0);
-            animation: slideInRight 0.3s;
-          }
-          @keyframes slideInRight {
-            from {
-              transform: translateX(100%);
-            }
-            to {
-              transform: translateX(0);
-            }
-          }
-          .mobile-menu-btn {
-            z-index: 1100;
-          }
-        }
-        /* Fix color contrast for buttons on purple backgrounds */
-        .btn-primary,
-        .stat-card,
-        .add-link-btn {
-          color: #fff !important;
         }
       `}</style>
     </header>
