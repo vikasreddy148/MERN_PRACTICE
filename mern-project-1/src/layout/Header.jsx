@@ -19,7 +19,11 @@ function Header() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className={`modern-header ${isScrolled ? "scrolled" : ""}`}>
+    <header
+      className={`modern-header ${isScrolled ? "scrolled" : ""} ${
+        isMobileMenuOpen ? "menu-open" : ""
+      }`}
+    >
       <nav className="navbar navbar-expand-lg">
         <div className="container">
           {/* Logo */}
@@ -39,6 +43,14 @@ function Header() {
           >
             {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
+
+          {/* Overlay for mobile menu */}
+          {isMobileMenuOpen && (
+            <div
+              className="mobile-menu-overlay"
+              onClick={() => setIsMobileMenuOpen(false)}
+            ></div>
+          )}
 
           {/* Navigation Menu */}
           <div className={`navbar-collapse ${isMobileMenuOpen ? "show" : ""}`}>
@@ -212,16 +224,46 @@ function Header() {
           color: #667eea;
         }
 
+        .mobile-menu-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.3);
+          z-index: 999;
+          display: block;
+        }
+        .menu-open {
+          overflow: hidden;
+        }
+
         /* Mobile Styles */
         @media (max-width: 991.98px) {
           .navbar-collapse {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-top: 1rem;
-            padding: 1rem;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 80vw;
+            max-width: 350px;
+            height: 100vh;
+            background: #fff;
+            border-radius: 0 0 0 16px;
+            box-shadow: -2px 0 30px rgba(0, 0, 0, 0.15);
+            margin-top: 0;
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
+            z-index: 1001;
+            transform: translateX(0);
+            animation: slideInRight 0.3s;
           }
-
+          @keyframes slideInRight {
+            from {
+              transform: translateX(100%);
+            }
+            to {
+              transform: translateX(0);
+            }
+          }
           .navbar-nav .nav-link {
             padding: 0.75rem 1rem;
             margin: 0.25rem 0;
@@ -257,6 +299,13 @@ function Header() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+
+        /* Fix color contrast for buttons on purple backgrounds */
+        .btn-primary,
+        .stat-card,
+        .add-link-btn {
+          color: #fff !important;
         }
       `}</style>
     </header>
