@@ -1,6 +1,6 @@
 const Links = require("../model/Links");
 const Users = require("../model/Users");
-const axios = require('axios');
+const axios = require("axios");
 const { getDeviceInfo } = require("../util/linkUtil");
 const Clicks = require("../model/Clicks");
 
@@ -186,8 +186,7 @@ const linksController = {
       );
       const { city, country, region, lat, lon, isp } = geoResponse.data;
       const userAgent = request.headers["user-agent"] || "unknown";
-      const { isMobile, browser } = getDeviceInfo(userAgent);
-      const deviceType = isMobile ? "Mobile" : "Desktop";
+      const { isMobile, browser, deviceType } = getDeviceInfo(userAgent);
 
       const referrer = request.get("Referrer") || null;
 
