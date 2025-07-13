@@ -5,9 +5,6 @@ import { serverEndpoint } from "../config/config";
 import { useDispatch } from "react-redux";
 import { SET_USER } from "../redux/user/actions";
 import Modal from "./Modal";
-import LoadingButton from "./LoadingButton";
-import LoadingSpinner from "./LoadingSpinner";
-import { toast } from "react-toastify";
 import styles from "./LoginRegisterModal.module.css";
 
 function RegisterModal({ isOpen, onClose }) {
@@ -18,8 +15,6 @@ function RegisterModal({ isOpen, onClose }) {
     name: "",
   });
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleChange = (event) => {
     const name = event.target.name;
@@ -49,7 +44,6 @@ function RegisterModal({ isOpen, onClose }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (validate()) {
-      setIsSubmitting(true);
       const body = {
         username: formData.username,
         password: formData.password,
@@ -63,23 +57,18 @@ function RegisterModal({ isOpen, onClose }) {
           configuration
         );
         dispatch({ type: SET_USER, payload: response.data.user });
-        toast.success("Registration successful! Welcome to Affiliate++.");
         onClose();
       } catch (error) {
-        let errorMessage = "Registration failed. Please try again.";
         if (error?.response?.status === 401) {
-          errorMessage = "User already exists with this email.";
+          setErrors({ message: "User exists with the given email" });
+        } else {
+          setErrors({ message: "Something went wrong, please try again" });
         }
-        setErrors({ message: errorMessage });
-        toast.error(errorMessage);
-      } finally {
-        setIsSubmitting(false);
       }
     }
   };
 
   const handleGoogleSignin = async (authResponse) => {
-    setIsGoogleLoading(true);
     try {
       const response = await axios.post(
         `${serverEndpoint}/auth/google-auth`,
@@ -87,15 +76,9 @@ function RegisterModal({ isOpen, onClose }) {
         { withCredentials: true }
       );
       dispatch({ type: SET_USER, payload: response.data.user });
-      toast.success("Google registration successful! Welcome to Affiliate++.");
       onClose();
     } catch (error) {
-      const errorMessage =
-        "Error processing Google registration. Please try again.";
-      setErrors({ message: errorMessage });
-      toast.error(errorMessage);
-    } finally {
-      setIsGoogleLoading(false);
+      setErrors({ message: "Something went wrong while Google sign-in" });
     }
   };
 
@@ -156,29 +139,18 @@ function RegisterModal({ isOpen, onClose }) {
               <div className={styles.invalidFeedback}>{errors.password}</div>
             )}
           </div>
-          <LoadingButton
-            type="submit"
-            className={styles.submitBtn}
-            loading={isSubmitting}
-            loadingText="Creating Account..."
-          >
+          <button type="submit" className={styles.submitBtn}>
             Register
-          </LoadingButton>
+          </button>
         </form>
         <div className={styles.orDivider}>
           <span>OR</span>
         </div>
         <div className={styles.googleLoginWrapper}>
-          {isGoogleLoading && (
-            <div className={styles.googleLoadingOverlay}>
-              <LoadingSpinner text="Processing Google registration..." />
-            </div>
-          )}
           <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
             <GoogleLogin
               onSuccess={handleGoogleSignin}
               onError={handleGoogleSigninFailure}
-              disabled={isGoogleLoading}
             />
           </GoogleOAuthProvider>
         </div>

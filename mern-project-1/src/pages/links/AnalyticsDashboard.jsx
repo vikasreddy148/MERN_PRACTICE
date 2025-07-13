@@ -16,20 +16,6 @@ import {
   Legend,
   Title,
 } from "chart.js";
-import {
-  FaArrowLeft,
-  FaChartBar,
-  FaFilter,
-  FaGlobe,
-  FaDesktop,
-  FaMobile,
-  FaTablet,
-  FaUsers,
-  FaMapMarkerAlt,
-  FaEye,
-  FaTable,
-} from "react-icons/fa";
-import styles from "./AnalyticsDashboard.module.css";
 
 ChartJS.register(
   BarElement,
@@ -65,11 +51,9 @@ function AnalyticsDashboard() {
   const [analyticsData, setAnalyticsData] = useState([]);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   const fetchAnalytics = async () => {
     try {
-      setLoading(true);
       const response = await axios.get(`${serverEndpoint}/links/analytics`, {
         params: {
           linkId: id,
@@ -82,8 +66,6 @@ function AnalyticsDashboard() {
     } catch (error) {
       console.log(error);
       navigate("/error");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -97,18 +79,6 @@ function AnalyticsDashboard() {
 
   const clicksByCity = groupBy("city");
   const clicksByBrowser = groupBy("browser");
-
-  // Calculate additional statistics
-  const totalClicks = analyticsData.length;
-  const uniqueCountries = new Set(analyticsData.map((item) => item.country))
-    .size;
-  const uniqueCities = new Set(analyticsData.map((item) => item.city)).size;
-  const deviceTypes = groupBy("deviceType");
-
-  // Get device type counts
-  const desktopClicks = deviceTypes.desktop || 0;
-  const mobileClicks = deviceTypes.mobile || 0;
-  const tabletClicks = deviceTypes.tablet || 0;
 
   const columns = [
     { field: "ip", headerName: "IP Address", flex: 1 },
@@ -131,290 +101,89 @@ function AnalyticsDashboard() {
   }, [fromDate, toDate, id]);
 
   return (
-    <div className={styles.analyticsDashboard}>
-      {/* Header Section */}
-      <div className={styles.dashboardHeader}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerLeft}>
-            <h1 className={styles.dashboardTitle}>
-              <FaChartBar className={styles.titleIcon} />
-              Link Analytics
-            </h1>
-            <p className={styles.dashboardSubtitle}>
-              Detailed insights and performance metrics for your affiliate link
-            </p>
-          </div>
-          <div className={styles.headerRight}>
-            <button
-              className={styles.backBtn}
-              onClick={() => navigate("/dashboard")}
-            >
-              <FaArrowLeft className={styles.btnIcon} />
-              Back to Dashboard
-            </button>
-          </div>
+    <div className="container py-5">
+      <h1>Analytics for LinkID: {id}</h1>
+
+      <div className="row mb-4 mx-0 border py-3 border">
+        <h5>Filters:</h5>
+        <div className="col-md-2">
+          <DatePicker
+            selected={fromDate}
+            onChange={(date) => setFromDate(date)}
+            className="form-control"
+            placeholderText="From (Date)"
+          />
+        </div>
+        <div className="col-md-2">
+          <DatePicker
+            selected={toDate}
+            onChange={(date) => setToDate(date)}
+            className="form-control"
+            placeholderText="To (Date)"
+          />
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className={styles.statsSection}>
-        <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>
-              <FaEye />
-            </div>
-            <div className={styles.statContent}>
-              <div className={styles.statNumber}>{totalClicks}</div>
-              <div className={styles.statLabel}>Total Clicks</div>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>
-              <FaGlobe />
-            </div>
-            <div className={styles.statContent}>
-              <div className={styles.statNumber}>{uniqueCountries}</div>
-              <div className={styles.statLabel}>Countries</div>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>
-              <FaMapMarkerAlt />
-            </div>
-            <div className={styles.statContent}>
-              <div className={styles.statNumber}>{uniqueCities}</div>
-              <div className={styles.statLabel}>Cities</div>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>
-              <FaUsers />
-            </div>
-            <div className={styles.statContent}>
-              <div className={styles.statNumber}>
-                {Object.keys(clicksByBrowser).length}
-              </div>
-              <div className={styles.statLabel}>Browsers</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters Section */}
-      <div className={styles.filtersSection}>
-        <h3 className={styles.filtersTitle}>
-          <FaFilter className={styles.filtersIcon} />
-          Date Filters
-        </h3>
-        <div className={styles.filtersContent}>
-          <div className={styles.datePickerContainer}>
-            <label className={styles.datePickerLabel}>From Date</label>
-            <DatePicker
-              selected={fromDate}
-              onChange={(date) => setFromDate(date)}
-              className={styles.datePicker}
-              placeholderText="Select start date"
-              dateFormat="MMM dd, yyyy"
-            />
-          </div>
-          <div className={styles.datePickerContainer}>
-            <label className={styles.datePickerLabel}>To Date</label>
-            <DatePicker
-              selected={toDate}
-              onChange={(date) => setToDate(date)}
-              className={styles.datePicker}
-              placeholderText="Select end date"
-              dateFormat="MMM dd, yyyy"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Charts Section */}
-      <div className={styles.chartsSection}>
-        <div className={styles.chartsGrid}>
-          <div className={styles.chartCard}>
-            <h3 className={styles.chartTitle}>
-              <FaMapMarkerAlt className={styles.chartIcon} />
-              Clicks by City
-            </h3>
-            <div className={styles.chartDivider}></div>
-            <div className={styles.chartContainer}>
-              <Bar
-                data={{
-                  labels: Object.keys(clicksByCity),
-                  datasets: [
-                    {
-                      label: "Clicks",
-                      data: Object.values(clicksByCity),
-                      backgroundColor: "rgba(102, 126, 234, 0.8)",
-                      borderColor: "rgba(102, 126, 234, 1)",
-                      borderWidth: 1,
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      display: false,
-                    },
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      grid: {
-                        color: "rgba(0, 0, 0, 0.1)",
-                      },
-                    },
-                    x: {
-                      grid: {
-                        display: false,
-                      },
-                    },
-                  },
-                }}
-              />
-            </div>
-          </div>
-
-          <div className={styles.chartCard}>
-            <h3 className={styles.chartTitle}>
-              <FaGlobe className={styles.chartIcon} />
-              Clicks by Browser
-            </h3>
-            <div className={styles.chartDivider}></div>
-            <div className={styles.chartContainer}>
-              <Pie
-                data={{
-                  labels: Object.keys(clicksByBrowser),
-                  datasets: [
-                    {
-                      data: Object.values(clicksByBrowser),
-                      backgroundColor: [
-                        "#667eea",
-                        "#764ba2",
-                        "#f093fb",
-                        "#f5576c",
-                        "#4facfe",
-                        "#00f2fe",
-                      ],
-                      borderWidth: 2,
-                      borderColor: "#fff",
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      position: "bottom",
-                      labels: {
-                        padding: 20,
-                        usePointStyle: true,
-                      },
-                    },
-                  },
-                }}
-              />
-            </div>
-          </div>
-        </div>
-        
-        {/* Device Type Chart */}
-        <div className={styles.chartCard} style={{ marginTop: "2rem" }}>
-          <h3 className={styles.chartTitle}>
-            <FaDesktop className={styles.chartIcon} />
-            Clicks by Device Type
-          </h3>
-          <div className={styles.chartDivider}></div>
-          <div className={styles.chartContainer} style={{ height: "250px" }}>
-            <Bar
-              data={{
-                labels: ["Desktop", "Mobile", "Tablet"],
-                datasets: [
-                  {
-                    label: "Clicks",
-                    data: [desktopClicks, mobileClicks, tabletClicks],
-                    backgroundColor: [
-                      "rgba(102, 126, 234, 0.8)",
-                      "rgba(118, 75, 162, 0.8)",
-                      "rgba(240, 147, 251, 0.8)",
-                    ],
-                    borderColor: [
-                      "rgba(102, 126, 234, 1)",
-                      "rgba(118, 75, 162, 1)",
-                      "rgba(240, 147, 251, 1)",
-                    ],
-                    borderWidth: 1,
-                  },
-                ],
-              }}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    display: false,
-                  },
+      <div className="row mb-4 mx-0 border py-3 rounded">
+        <div className="col-md-8 p-3 rounded mt-2">
+          <h5>Clicks by City</h5>
+          <hr />
+          <Bar
+            data={{
+              labels: Object.keys(clicksByCity),
+              datasets: [
+                {
+                  label: "Clicks",
+                  data: Object.values(clicksByCity),
+                  backgroundColor: "rgba(54, 162, 235, 0.6)",
                 },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    grid: {
-                      color: "rgba(0, 0, 0, 0.1)",
-                    },
-                  },
-                  x: {
-                    grid: {
-                      display: false,
-                    },
-                  },
+              ],
+            }}
+            options={{ responsive: true }}
+          />
+        </div>
+
+        <div className="col-md-4 p-3 rounded mt-2">
+          <h5>Clicks by Browser</h5>
+          <hr />
+          <Pie
+            data={{
+              labels: Object.keys(clicksByBrowser),
+              datasets: [
+                {
+                  data: Object.values(clicksByCity),
+                  backgroundColor: [
+                    "#FF6384",
+                    "#36A2EB",
+                    "#FFCE56",
+                    "#4BC0C0",
+                    "#9966FF",
+                    "#FF9F40",
+                  ],
                 },
-              }}
-            />
-          </div>
+              ],
+            }}
+            options={{ responsive: true }}
+          />
         </div>
       </div>
 
-      {/* Data Grid Section */}
-      <div className={styles.dataGridContainer}>
-        <h3 className={styles.dataGridTitle}>
-          <FaTable className={styles.dataGridIcon} />
-          Click Details
-        </h3>
-        <DataGrid
-          getRowId={(row) => row._id}
-          rows={analyticsData}
-          columns={columns}
-          loading={loading}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 20, page: 0 },
-            },
-          }}
-          pageSizeOptions={[20, 50, 100]}
-          disableRowSelectionOnClick
-          showToolbar
-          sx={{
-            fontFamily: "inherit",
-            border: "none",
-            "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid #f0f0f0",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#f8f9fa",
-              borderBottom: "2px solid #e9ecef",
-            },
-            "& .MuiDataGrid-row:hover": {
-              backgroundColor: "#f8f9fa",
-            },
-          }}
-          density="comfortable"
-        />
-      </div>
+      <DataGrid
+        getRowId={(row) => row._id}
+        rows={analyticsData}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize: 20, page: 0 },
+          },
+        }}
+        pageSizeOptions={[20, 50, 100]}
+        disableRowSelectionOnClick
+        showToolbar
+        sx={{
+          fontFamily: "inherit",
+        }}
+      />
     </div>
   );
 }

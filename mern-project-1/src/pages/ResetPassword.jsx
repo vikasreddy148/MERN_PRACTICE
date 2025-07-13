@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { serverEndpoint } from "../config/config";
-import LoadingButton from "../components/LoadingButton";
-import { toast } from "react-toastify";
 
 function ResetPassword() {
   const location = useLocation();
@@ -15,8 +13,6 @@ function ResetPassword() {
   const [success, setSuccess] = useState("");
   const [showResend, setShowResend] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResending, setIsResending] = useState(false);
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -43,7 +39,6 @@ function ResetPassword() {
   };
 
   const handleResend = async () => {
-    setIsResending(true);
     setError("");
     setSuccess("");
     try {
@@ -51,22 +46,15 @@ function ResetPassword() {
         email,
       });
       setSuccess("Reset code resent to your email.");
-      toast.success("Reset code resent to your email.");
       setShowResend(false);
       startResendTimer();
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to resend code";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsResending(false);
+      setError(err.response?.data?.message || "Failed to resend code");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError("");
     setSuccess("");
     try {
@@ -76,15 +64,9 @@ function ResetPassword() {
         newPassword,
       });
       setSuccess("Password reset successful! Redirecting to login...");
-      toast.success("Password reset successful! Redirecting to login...");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to reset password";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+      setError(err.response?.data?.message || "Failed to reset password");
     }
   };
 
@@ -144,15 +126,13 @@ function ResetPassword() {
               <div className="mb-3 text-center">
                 <div className="mb-1 fw-semibold">Didn't receive code?</div>
                 {showResend ? (
-                  <LoadingButton
+                  <button
                     className="btn btn-link"
                     onClick={handleResend}
                     disabled={resendTimer > 0}
-                    loading={isResending}
-                    loadingText="Sending..."
                   >
                     Resend Code
-                  </LoadingButton>
+                  </button>
                 ) : (
                   <span className="text-muted">
                     You can resend the code in {resendTimer}s
@@ -161,14 +141,9 @@ function ResetPassword() {
               </div>
             )}
             <div className="d-grid">
-              <LoadingButton
-                type="submit"
-                className="btn btn-primary"
-                loading={isSubmitting}
-                loadingText="Resetting..."
-              >
+              <button type="submit" className="btn btn-primary">
                 Reset Password
-              </LoadingButton>
+              </button>
             </div>
           </form>
         </div>

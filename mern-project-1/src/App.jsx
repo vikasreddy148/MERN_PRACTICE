@@ -10,7 +10,7 @@ import { serverEndpoint } from "./config/config";
 import { useDispatch, useSelector } from "react-redux";
 import { SET_USER } from "./redux/user/actions";
 import UserLayout from "./layout/UserLayout";
-import LoadingSpinner from "./components/LoadingSpinner";
+import { Spinner } from "react-bootstrap";
 import ManageUsers from "./pages/users/ManageUsers";
 import UnauthorizedAccess from "./components/UnauthorizedAccess";
 import ProtectedRoute from "./rbac/ProtectedRoute";
@@ -50,7 +50,7 @@ function App() {
   }, []);
 
   if (loading) {
-    return <LoadingSpinner fullScreen text="Initializing..." />;
+    return <Spinner />;
   }
 
   return (

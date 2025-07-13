@@ -2,34 +2,24 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { serverEndpoint } from "../config/config";
-import LoadingButton from "../components/LoadingButton";
-import { toast } from "react-toastify";
 
 function ForgetPassword() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError("");
     setSuccess("");
     try {
       await axios.post(`${serverEndpoint}/auth/send-reset-password-token`, {
         email,
       });
-      toast.success("Reset code sent to your email!");
       navigate("/reset-password", { state: { email } });
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to send reset code";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+      setError(err.response?.data?.message || "Failed to send reset code");
     }
   };
 
@@ -55,14 +45,9 @@ function ForgetPassword() {
               />
             </div>
             <div className="d-grid">
-              <LoadingButton
-                type="submit"
-                className="btn btn-primary"
-                loading={isSubmitting}
-                loadingText="Sending..."
-              >
+              <button type="submit" className="btn btn-primary">
                 Send Reset Code
-              </LoadingButton>
+              </button>
             </div>
           </form>
         </div>

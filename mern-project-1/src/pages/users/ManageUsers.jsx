@@ -5,9 +5,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { serverEndpoint } from "../../config/config";
 import Modal from "../../components/Modal";
-import LoadingButton from "../../components/LoadingButton";
-import SkeletonLoader from "../../components/SkeletonLoader";
-import { toast } from "react-toastify";
 import styles from "./ManageUsersModal.module.css";
 
 const USER_ROLES = ["viewer", "developer"];
@@ -49,8 +46,6 @@ function ManageUsers() {
   };
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteModalShow = (userId) => {
     setFormData({
@@ -64,7 +59,6 @@ function ManageUsers() {
   };
 
   const handleDeleteSubmit = async () => {
-    setIsDeleting(true);
     try {
       setFormLoading(true);
       await axios.delete(`${serverEndpoint}/users/${formData.id}`, {
@@ -76,13 +70,9 @@ function ManageUsers() {
         name: "",
       });
       fetchUsers();
-      toast.success("User deleted successfully!");
     } catch (error) {
-      const errorMessage = "Something went wrong, please try again";
-      setErrors({ message: errorMessage });
-      toast.error(errorMessage);
+      setErrors({ message: "Something went wrong, please try again" });
     } finally {
-      setIsDeleting(false);
       handleDeleteModalClose();
       setFormLoading(false);
     }
@@ -124,7 +114,6 @@ function ManageUsers() {
     event.preventDefault();
 
     if (validate()) {
-      setIsSubmitting(true);
       setFormLoading(true);
       const body = {
         email: formData.email,
@@ -141,10 +130,8 @@ function ManageUsers() {
             body,
             configuration
           );
-          toast.success("User updated successfully!");
         } else {
           await axios.post(`${serverEndpoint}/users`, body, configuration);
-          toast.success("User created successfully!");
         }
 
         setFormData({
@@ -154,11 +141,8 @@ function ManageUsers() {
         });
         fetchUsers();
       } catch (error) {
-        const errorMessage = "Something went wrong, please try again";
-        setErrors({ message: errorMessage });
-        toast.error(errorMessage);
+        setErrors({ message: "Something went wrong, please try again" });
       } finally {
-        setIsSubmitting(false);
         handleModalClose();
         setFormLoading(false);
       }
@@ -234,27 +218,23 @@ function ManageUsers() {
       )}
 
       <div style={{ height: 500, width: "100%" }}>
-        {loading ? (
-          <SkeletonLoader type="table" rows={8} columns={4} height={60} />
-        ) : (
-          <DataGrid
-            getRowId={(row) => row._id}
-            rows={usersData}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 20, page: 0 },
-              },
-            }}
-            pageSizeOptions={[20, 50, 100]}
-            disableRowSelectionOnClick
-            showToolbar
-            sx={{
-              fontFamily: "inherit",
-            }}
-            loading={loading}
-          />
-        )}
+        <DataGrid
+          getRowId={(row) => row._id}
+          rows={usersData}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 20, page: 0 },
+            },
+          }}
+          pageSizeOptions={[20, 50, 100]}
+          disableRowSelectionOnClick
+          showToolbar
+          sx={{
+            fontFamily: "inherit",
+          }}
+          loading={loading}
+        />
       </div>
 
       {/* Add/Edit User Modal */}
@@ -312,14 +292,13 @@ function ManageUsers() {
                 <div className={styles.invalidFeedback}>{errors.role}</div>
               )}
             </div>
-            <LoadingButton
+            <button
               type="submit"
               className={styles.submitBtn}
-              loading={isSubmitting}
-              loadingText={isEdit ? "Updating..." : "Creating..."}
+              disabled={formLoading}
             >
               {isEdit ? "Update User" : "Add User"}
-            </LoadingButton>
+            </button>
           </form>
         </div>
       </Modal>
@@ -344,15 +323,14 @@ function ManageUsers() {
             >
               Cancel
             </button>
-            <LoadingButton
+            <button
               className={styles.submitBtn}
               style={{ background: "#e74c3c" }}
               onClick={handleDeleteSubmit}
-              loading={isDeleting}
-              loadingText="Deleting..."
+              disabled={formLoading}
             >
               Delete
-            </LoadingButton>
+            </button>
           </div>
         </div>
       </Modal>
