@@ -5,6 +5,8 @@ import { serverEndpoint, googleClientId } from "../config/config";
 import { useDispatch } from "react-redux";
 import { SET_USER } from "../redux/user/actions";
 import Modal from "./Modal";
+import ForgotPasswordModal from "./ForgotPasswordModal";
+import ResetPasswordModal from "./ResetPasswordModal";
 import styles from "./LoginRegisterModal.module.css";
 
 function LoginModal({ isOpen, onClose }) {
@@ -14,11 +16,29 @@ function LoginModal({ isOpen, onClose }) {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleForgotPassword = () => {
+    onClose(); // Close the login modal
+    setShowForgotPassword(true);
+  };
+
+  const handleShowResetPassword = (email) => {
+    setResetEmail(email);
+    setShowResetPassword(true);
+  };
+
+  const handleResetPasswordSuccess = () => {
+    // Optionally show a success message or redirect
+    console.log("Password reset successful");
   };
 
   const validate = () => {
@@ -79,60 +99,82 @@ function LoginModal({ isOpen, onClose }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className={styles.modalContent}>
-        <h2 className={styles.heading}>Sign in to Continue</h2>
-        {errors.message && (
-          <div className={styles.errorAlert}>{errors.message}</div>
-        )}
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className={errors.username ? styles.invalid : ""}
-              autoComplete="username"
-            />
-            {errors.username && (
-              <div className={styles.invalidFeedback}>{errors.username}</div>
-            )}
+    <>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.heading}>Sign in to Continue</h2>
+          {errors.message && (
+            <div className={styles.errorAlert}>{errors.message}</div>
+          )}
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.formGroup}>
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className={errors.username ? styles.invalid : ""}
+                autoComplete="username"
+              />
+              {errors.username && (
+                <div className={styles.invalidFeedback}>{errors.username}</div>
+              )}
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={errors.password ? styles.invalid : ""}
+                autoComplete="current-password"
+              />
+              {errors.password && (
+                <div className={styles.invalidFeedback}>{errors.password}</div>
+              )}
+            </div>
+            <div className={styles.forgotPasswordWrapper}>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className={styles.forgotPasswordLink}
+              >
+                Forgot Password?
+              </button>
+            </div>
+            <button type="submit" className={styles.submitBtn}>
+              Sign In
+            </button>
+          </form>
+          <div className={styles.orDivider}>
+            <span>OR</span>
           </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={errors.password ? styles.invalid : ""}
-              autoComplete="current-password"
-            />
-            {errors.password && (
-              <div className={styles.invalidFeedback}>{errors.password}</div>
-            )}
+          <div className={styles.googleLoginWrapper}>
+            <GoogleOAuthProvider clientId={googleClientId}>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+              />
+            </GoogleOAuthProvider>
           </div>
-          <button type="submit" className={styles.submitBtn}>
-            Sign In
-          </button>
-        </form>
-        <div className={styles.orDivider}>
-          <span>OR</span>
         </div>
-        <div className={styles.googleLoginWrapper}>
-          <GoogleOAuthProvider clientId={googleClientId}>
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-            />
-          </GoogleOAuthProvider>
-        </div>
-      </div>
-    </Modal>
+      </Modal>
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onShowResetPassword={handleShowResetPassword}
+      />
+      <ResetPasswordModal
+        isOpen={showResetPassword}
+        onClose={() => setShowResetPassword(false)}
+        email={resetEmail}
+        onSuccess={handleResetPasswordSuccess}
+      />
+    </>
   );
 }
 

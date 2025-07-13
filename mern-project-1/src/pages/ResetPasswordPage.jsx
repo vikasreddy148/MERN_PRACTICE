@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { serverEndpoint } from "../config/config";
 
-function ResetPassword() {
-  const location = useLocation();
+function ResetPasswordPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState(location.state?.email || "");
+  const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
@@ -63,8 +62,8 @@ function ResetPassword() {
         code,
         newPassword,
       });
-      setSuccess("Password reset successful! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 1500);
+      setSuccess("Password reset successful! Redirecting to dashboard...");
+      setTimeout(() => navigate("/dashboard"), 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to reset password");
     }
@@ -78,21 +77,19 @@ function ResetPassword() {
           {error && <div className="alert alert-danger">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
           <form onSubmit={handleSubmit}>
-            {!location.state?.email && (
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-            )}
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
             <div className="mb-3">
               <label htmlFor="code" className="form-label">
                 6-digit Code
@@ -121,7 +118,6 @@ function ResetPassword() {
                 required
               />
             </div>
-            {/* Timer and resend link below new password */}
             {email && (
               <div className="mb-3 text-center">
                 <div className="mb-1 fw-semibold">Didn't receive code?</div>
@@ -152,4 +148,4 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default ResetPasswordPage;
