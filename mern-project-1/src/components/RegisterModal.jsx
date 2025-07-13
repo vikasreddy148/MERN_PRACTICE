@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { serverEndpoint } from "../config/config";
+import { serverEndpoint, googleClientId } from "../config/config";
 import { useDispatch } from "react-redux";
 import { SET_USER } from "../redux/user/actions";
 import Modal from "./Modal";
@@ -147,7 +147,7 @@ function RegisterModal({ isOpen, onClose }) {
           <span>OR</span>
         </div>
         <div className={styles.googleLoginWrapper}>
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+          <GoogleOAuthProvider clientId={googleClientId}>
             <GoogleLogin
               onSuccess={handleGoogleSignin}
               onError={handleGoogleSigninFailure}

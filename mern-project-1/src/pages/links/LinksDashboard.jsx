@@ -19,7 +19,7 @@ import {
   FaCopy,
   FaExternalLinkAlt,
 } from "react-icons/fa";
-import styles from "./LinkModal.module.css";
+import styles from "./LinksDashboard.module.css";
 
 function LinksDashboard() {
   const [errors, setErrors] = useState({});
@@ -106,6 +106,14 @@ function LinksDashboard() {
     if (formData.originalUrl.length === 0) {
       newErrors.originalUrl = "URL is mandatory";
       isValid = false;
+    } else {
+      // Basic URL validation
+      try {
+        new URL(formData.originalUrl);
+      } catch (e) {
+        newErrors.originalUrl = "Please enter a valid URL";
+        isValid = false;
+      }
     }
 
     if (formData.category.length === 0) {
@@ -157,23 +165,48 @@ function LinksDashboard() {
   const fetchLinks = async () => {
     try {
       setLoading(true);
+      setErrors({}); // Clear previous errors
       const response = await axios.get(`${serverEndpoint}/links`, {
         withCredentials: true,
       });
       setLinksData(response.data.data);
     } catch (error) {
-      console.log(error);
-      setErrors({
-        message: "Unable to fetch links at the moment. Please try again",
-      });
+      console.error("Failed to fetch links:", error);
+      let errorMessage =
+        "Unable to fetch links at the moment. Please try again";
+
+      if (error.response?.status === 401) {
+        errorMessage = "Session expired. Please log in again.";
+      } else if (error.response?.status >= 500) {
+        errorMessage = "Server error. Please try again later.";
+      } else if (!error.response) {
+        errorMessage = "Network error. Please check your connection.";
+      }
+
+      setErrors({ message: errorMessage });
     } finally {
       setLoading(false);
     }
   };
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    // You could add a toast notification here
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      // You could add a toast notification here for success
+    } catch (error) {
+      console.error("Failed to copy to clipboard:", error);
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand("copy");
+      } catch (fallbackError) {
+        console.error("Fallback copy failed:", fallbackError);
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   useEffect(() => {
@@ -186,9 +219,11 @@ function LinksDashboard() {
       headerName: "Campaign",
       flex: 2,
       renderCell: (params) => (
-        <div className="campaign-cell">
-          <FaLink className="campaign-icon" />
-          <span className="campaign-title">{params.row.campaignTitle}</span>
+        <div className={styles.campaignCell}>
+          <FaLink className={styles.campaignIcon} />
+          <span className={styles.campaignTitle}>
+            {params.row.campaignTitle}
+          </span>
         </div>
       ),
     },
@@ -197,18 +232,18 @@ function LinksDashboard() {
       headerName: "URL",
       flex: 3,
       renderCell: (params) => (
-        <div className="url-cell">
+        <div className={styles.urlCell}>
           <a
             href={`${serverEndpoint}/links/r/${params.row._id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="url-link"
+            className={styles.urlLink}
           >
             {params.row.originalUrl}
-            <FaExternalLinkAlt className="external-icon" />
+            <FaExternalLinkAlt className={styles.externalIcon} />
           </a>
           <button
-            className="copy-btn"
+            className={styles.copyBtn}
             onClick={() =>
               copyToClipboard(`${serverEndpoint}/links/r/${params.row._id}`)
             }
@@ -224,7 +259,7 @@ function LinksDashboard() {
       headerName: "Category",
       flex: 1.5,
       renderCell: (params) => (
-        <span className="category-badge">{params.row.category}</span>
+        <span className={styles.categoryBadge}>{params.row.category}</span>
       ),
     },
     {
@@ -232,9 +267,11 @@ function LinksDashboard() {
       headerName: "Clicks",
       flex: 1,
       renderCell: (params) => (
-        <div className="clicks-cell">
-          <FaChartLine className="clicks-icon" />
-          <span className="clicks-count">{params.row.clickCount || 0}</span>
+        <div className={styles.clicksCell}>
+          <FaChartLine className={styles.clicksIcon} />
+          <span className={styles.clicksCount}>
+            {params.row.clickCount || 0}
+          </span>
         </div>
       ),
     },
@@ -243,10 +280,10 @@ function LinksDashboard() {
       headerName: "Actions",
       flex: 1.5,
       renderCell: (params) => (
-        <div className="action-buttons">
+        <div className={styles.actionButtons}>
           {permission.canEditLink && (
             <button
-              className="action-btn edit-btn"
+              className={`${styles.actionBtn} ${styles.editBtn}`}
               onClick={() => handleOpenModal(true, params.row)}
               title="Edit link"
             >
@@ -256,7 +293,7 @@ function LinksDashboard() {
 
           {permission.canDeleteLink && (
             <button
-              className="action-btn delete-btn"
+              className={`${styles.actionBtn} ${styles.deleteBtn}`}
               onClick={() => handleShowDeleteModal(params.row._id)}
               title="Delete link"
             >
@@ -266,7 +303,7 @@ function LinksDashboard() {
 
           {permission.canViewLink && (
             <button
-              className="action-btn view-btn"
+              className={`${styles.actionBtn} ${styles.viewBtn}`}
               onClick={() => navigate(`/analytics/${params.row._id}`)}
               title="View analytics"
             >
@@ -279,26 +316,26 @@ function LinksDashboard() {
   ];
 
   return (
-    <div className="links-dashboard">
+    <div className={styles.linksDashboard}>
       {/* Header Section */}
-      <div className="dashboard-header">
-        <div className="header-content">
-          <div className="header-left">
-            <h1 className="dashboard-title">
-              <FaLink className="title-icon" />
+      <div className={styles.dashboardHeader}>
+        <div className={styles.headerContent}>
+          <div>
+            <h1 className={styles.dashboardTitle}>
+              <FaLink className={styles.titleIcon} />
               Manage Affiliate Links
             </h1>
-            <p className="dashboard-subtitle">
+            <p className={styles.dashboardSubtitle}>
               Create, track, and optimize your affiliate marketing campaigns
             </p>
           </div>
-          <div className="header-right">
+          <div>
             {permission.canCreateLink && (
               <button
-                className="add-link-btn"
+                className={styles.addLinkBtn}
                 onClick={() => handleOpenModal(false)}
               >
-                <FaPlus className="btn-icon" />
+                <FaPlus className={styles.btnIcon} />
                 Add New Link
               </button>
             )}
@@ -307,40 +344,40 @@ function LinksDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="stats-section">
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">
+      <div className={styles.statsSection}>
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={styles.statIcon}>
               <FaLink />
             </div>
-            <div className="stat-content">
-              <div className="stat-number">{linksData.length}</div>
-              <div className="stat-label">Total Links</div>
+            <div>
+              <div className={styles.statNumber}>{linksData.length}</div>
+              <div className={styles.statLabel}>Total Links</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">
+          <div className={styles.statCard}>
+            <div className={styles.statIcon}>
               <FaChartLine />
             </div>
-            <div className="stat-content">
-              <div className="stat-number">
+            <div>
+              <div className={styles.statNumber}>
                 {linksData.reduce(
                   (sum, link) => sum + (link.clickCount || 0),
                   0
                 )}
               </div>
-              <div className="stat-label">Total Clicks</div>
+              <div className={styles.statLabel}>Total Clicks</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">
+          <div className={styles.statCard}>
+            <div className={styles.statIcon}>
               <FaEye />
             </div>
-            <div className="stat-content">
-              <div className="stat-number">
+            <div>
+              <div className={styles.statNumber}>
                 {linksData.filter((link) => (link.clickCount || 0) > 0).length}
               </div>
-              <div className="stat-label">Active Links</div>
+              <div className={styles.statLabel}>Active Links</div>
             </div>
           </div>
         </div>
@@ -348,16 +385,16 @@ function LinksDashboard() {
 
       {/* Error Message */}
       {errors.message && (
-        <div className="error-alert">
-          <div className="error-content">
-            <span className="error-icon">⚠️</span>
-            <span className="error-text">{errors.message}</span>
+        <div className={styles.errorAlert}>
+          <div className={styles.errorContent}>
+            <span className={styles.errorIcon}>⚠️</span>
+            <span className={styles.errorText}>{errors.message}</span>
           </div>
         </div>
       )}
 
       {/* Data Grid */}
-      <div className="data-grid-container">
+      <div className={styles.dataGridContainer}>
         <DataGrid
           getRowId={(row) => row._id}
           rows={linksData}
@@ -482,291 +519,6 @@ function LinksDashboard() {
           </div>
         </div>
       </Modal>
-
-      <style jsx>{`
-        .links-dashboard {
-          padding: 2rem;
-          background: #f8f9fa;
-          min-height: calc(100vh - 80px);
-        }
-
-        .dashboard-header {
-          background: white;
-          border-radius: 16px;
-          padding: 2rem;
-          margin-bottom: 2rem;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .header-content {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .dashboard-title {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 2rem;
-          font-weight: 700;
-          color: #2c3e50;
-          margin: 0;
-        }
-
-        .title-icon {
-          color: #667eea;
-          font-size: 1.5rem;
-        }
-
-        .dashboard-subtitle {
-          color: #6c757d;
-          margin: 0.5rem 0 0 0;
-          font-size: 1rem;
-        }
-
-        .add-link-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          padding: 0.75rem 1.5rem;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .add-link-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-icon {
-          font-size: 0.875rem;
-        }
-
-        .stats-section {
-          margin-bottom: 2rem;
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 1.5rem;
-        }
-
-        .stat-card {
-          background: white;
-          border-radius: 12px;
-          padding: 1.5rem;
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-          transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-          transform: translateY(-2px);
-        }
-
-        .stat-icon {
-          width: 50px;
-          height: 50px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 1.25rem;
-        }
-
-        .stat-number {
-          font-size: 1.75rem;
-          font-weight: 700;
-          color: #2c3e50;
-          line-height: 1;
-        }
-
-        .stat-label {
-          color: #6c757d;
-          font-size: 0.875rem;
-          margin-top: 0.25rem;
-        }
-
-        .error-alert {
-          background: #fee;
-          border: 1px solid #fcc;
-          border-radius: 8px;
-          padding: 1rem;
-          margin-bottom: 2rem;
-        }
-
-        .error-content {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .error-icon {
-          font-size: 1.25rem;
-        }
-
-        .error-text {
-          color: #dc3545;
-          font-weight: 500;
-        }
-
-        .data-grid-container {
-          background: white;
-          border-radius: 16px;
-          padding: 1.5rem;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .campaign-cell {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .campaign-icon {
-          color: #667eea;
-          font-size: 0.875rem;
-        }
-
-        .campaign-title {
-          font-weight: 500;
-          color: #2c3e50;
-        }
-
-        .url-cell {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .url-link {
-          color: #667eea;
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-          gap: 0.25rem;
-          font-size: 0.875rem;
-        }
-
-        .url-link:hover {
-          text-decoration: underline;
-        }
-
-        .external-icon {
-          font-size: 0.75rem;
-        }
-
-        .copy-btn {
-          background: none;
-          border: none;
-          color: #6c757d;
-          cursor: pointer;
-          padding: 0.25rem;
-          border-radius: 4px;
-          transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-          background: #f8f9fa;
-          color: #667eea;
-        }
-
-        .category-badge {
-          background: #e3f2fd;
-          color: #1976d2;
-          padding: 0.25rem 0.75rem;
-          border-radius: 20px;
-          font-size: 0.75rem;
-          font-weight: 500;
-        }
-
-        .clicks-cell {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .clicks-icon {
-          color: #28a745;
-          font-size: 0.875rem;
-        }
-
-        .clicks-count {
-          font-weight: 600;
-          color: #2c3e50;
-        }
-
-        .action-buttons {
-          display: flex;
-          gap: 0.5rem;
-        }
-
-        .action-btn {
-          background: none;
-          border: none;
-          padding: 0.5rem;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-size: 0.875rem;
-        }
-
-        .edit-btn {
-          color: #ffc107;
-        }
-
-        .edit-btn:hover {
-          background: #fff3cd;
-        }
-
-        .delete-btn {
-          color: #dc3545;
-        }
-
-        .delete-btn:hover {
-          background: #f8d7da;
-        }
-
-        .view-btn {
-          color: #17a2b8;
-        }
-
-        .view-btn:hover {
-          background: #d1ecf1;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .links-dashboard {
-            padding: 1rem;
-          }
-
-          .header-content {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-          }
-
-          .stats-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .dashboard-title {
-            font-size: 1.5rem;
-          }
-        }
-      `}</style>
     </div>
   );
 }

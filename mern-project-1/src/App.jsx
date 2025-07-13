@@ -33,13 +33,16 @@ function App() {
           withCredentials: true,
         }
       );
-      // updateUserDetails(response.data.user);
       dispatch({
         type: SET_USER,
         payload: response.data.user,
       });
     } catch (error) {
-      console.log(error);
+      console.error("Auth check failed:", error);
+      // Don't set user to null on network errors, only on auth failures
+      if (error.response?.status === 401) {
+        dispatch({ type: SET_USER, payload: null });
+      }
     } finally {
       setLoading(false);
     }
@@ -50,7 +53,14 @@ function App() {
   }, []);
 
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="text-center">
+          <Spinner animation="border" role="status" />
+          <div className="mt-3">Loading...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -173,6 +183,21 @@ function App() {
           <AppLayout>
             <ResetPassword />
           </AppLayout>
+        }
+      />
+      {/* 404 Route - must be last */}
+      <Route
+        path="*"
+        element={
+          userDetails ? (
+            <UserLayout>
+              <Error />
+            </UserLayout>
+          ) : (
+            <AppLayout>
+              <Error />
+            </AppLayout>
+          )
         }
       />
     </Routes>
