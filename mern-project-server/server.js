@@ -13,6 +13,9 @@ mongoose.connect(process.env.MONGO_URI).then(()=>console.log('MongoDB connected'
 ).catch((error)=>console.log(error));
 
 const app = express(); // Instantiate express app.
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
 
 app.use((request, response, next) => {
   // Skip json middleware for the webhook endpoint
@@ -33,7 +36,7 @@ app.use("/auth", authRoutes);
 app.use('/links',linksRoutes);
 app.use('/users',userRouutes);
 app.use('/payments',paymentRoutes)
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 app.listen(5001, (error) => {
   if (error) {
     console.log("Error starting the server", error);
