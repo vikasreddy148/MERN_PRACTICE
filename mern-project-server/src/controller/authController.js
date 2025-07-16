@@ -9,6 +9,16 @@ const sendMail = require("../service/emailService");
 const secret = process.env.JWT_SECRET;
 const refreshSecret = process.env.JWT_REFRESH_TOKEN_SECRET;
 
+// Dynamic cookie options for local and production using CLIENT_ENDPOINT
+const clientDomain = process.env.CLIENT_ENDPOINT; // e.g., "https://yourdomain.com"
+const isProduction = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "None" : "Lax",
+  path: "/"
+};
+
 const authController = {
   login: async (request, response) => {
     try {
@@ -43,20 +53,10 @@ const authController = {
       };
 
       const token = jwt.sign(user, secret, { expiresIn: "1h" });
-      response.cookie("jwtToken", token, {
-        httpOnly: true,
-        secure: true,
-        domain: "localhost",
-        path: "/",
-      });
+      response.cookie("jwtToken", token, cookieOptions);
       const refreshToken = jwt.sign(user, refreshSecret, { expiresIn: "7d" });
       //store it in the database if you want! Storing in DB will make refresh token more secure and you can revoke it if needed by deleting it from the database
-      response.cookie("jwtRefreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        domain: "localhost",
-        path: "/",
-      });
+      response.cookie("jwtRefreshToken", refreshToken, cookieOptions);
       response.json({ user: user, message: "User authenticated" });
     } catch (error) {
       console.log(error);
@@ -65,7 +65,8 @@ const authController = {
   },
 
   logout: (request, response) => {
-    response.clearCookie("jwtToken");
+    response.clearCookie("jwtToken", cookieOptions);
+    response.clearCookie("jwtRefreshToken", cookieOptions);
     response.json({ message: "Logout successfull" });
   },
 
@@ -83,12 +84,7 @@ const authController = {
           const { newAccessToken, user } = await attemotToRefreshToken(
             refreshToken
           );
-          response.cookie("jwtToken", newAccessToken, {
-            httpOnly: true,
-            secure: true,
-            domain: "localhost",
-            path: "/",
-          });
+          response.cookie("jwtToken", newAccessToken, cookieOptions);
           console.log("Refresh Token renewed the access token");
           return response.json({
             message: "User is logged in",
@@ -140,12 +136,7 @@ const authController = {
       };
       const token = jwt.sign(userDetails, secret, { expiresIn: "1h" });
 
-      response.cookie("jwtToken", token, {
-        httpOnly: true,
-        secure: true,
-        domain: "localhost",
-        path: "/",
-      });
+      response.cookie("jwtToken", token, cookieOptions);
       response.json({ message: "User registered", user: userDetails });
     } catch (error) {
       console.log(error);
@@ -190,19 +181,9 @@ const authController = {
       };
 
       const token = jwt.sign(user, secret, { expiresIn: "1h" });
-      response.cookie("jwtToken", token, {
-        httpOnly: true,
-        secure: true,
-        domain: "localhost",
-        path: "/",
-      });
+      response.cookie("jwtToken", token, cookieOptions);
       const refreshToken = jwt.sign(user, refreshSecret, { expiresIn: "7d" });
-      response.cookie("jwtRefreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        domain: "localhost",
-        path: "/",
-      });
+      response.cookie("jwtRefreshToken", refreshToken, cookieOptions);
       response.json({ user: user, message: "User authenticated" });
     } catch (error) {
       console.log(error);
