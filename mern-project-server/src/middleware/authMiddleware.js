@@ -22,9 +22,9 @@ const authMiddleware = {
           );
           response.cookie("jwtToken", newAccessToken, {
             httpOnly: true,
-            secure: true,
-            domain: "localhost",
+            secure: process.env.NODE_ENV === "production",
             path: "/",
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
           });
           console.log('Refresh Token renewed the access token')
           return response.json({
