@@ -20,10 +20,11 @@ const authMiddleware = {
           const { newAccessToken, user } = await attemotToRefreshToken(
             refreshToken
           );
+          const isProduction = process.env.NODE_ENV === "production";
           response.cookie("jwtToken", newAccessToken, {
             httpOnly: true,
-            secure: true,
-            domain: "localhost",
+            secure: isProduction,
+            sameSite: isProduction ? "None" : "Lax",
             path: "/",
           });
           console.log('Refresh Token renewed the access token')

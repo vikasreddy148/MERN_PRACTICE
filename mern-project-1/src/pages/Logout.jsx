@@ -17,6 +17,9 @@ function Logout() {
           withCredentials: true,
         }
       );
+      document.cookie = `jwtToken=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      document.cookie = `refreshToken=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+
       // updateUserDetails(null);
       dispatch({
         type: CLEAR_USER,
