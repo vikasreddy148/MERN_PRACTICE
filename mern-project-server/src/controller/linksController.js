@@ -3,10 +3,11 @@ const Users = require("../model/Users");
 const axios = require('axios');
 const { getDeviceInfo } = require("../util/linkUtil");
 const Clicks = require("../model/Clicks");
+const { generateUploadSignature } = require("../service/cloudinaryService");
 
 const linksController = {
   create: async (request, response) => {
-    const { campaign_title, original_url, category } = request.body;
+    const { campaign_title, original_url, category ,thumbnail} = request.body;
 
     try {
       // We're fetching user details from DB even though we have
@@ -27,6 +28,7 @@ const linksController = {
         campaignTitle: campaign_title,
         originalUrl: original_url,
         category: category,
+        thumbnail: thumbnail,
         user:
           request.user.role === "admin"
             ? request.user.id
@@ -134,13 +136,14 @@ const linksController = {
         });
       }
 
-      const { campaign_title, original_url, category } = request.body;
+      const { campaign_title, original_url, category ,thumbnail} = request.body;
       link = await Links.findByIdAndUpdate(
         linkId,
         {
           campaignTitle: campaign_title,
           originalUrl: original_url,
           category: category,
+          thumbnail:thumbnail,
         },
         { new: true }
       ); // new: true flag makes sure mongodb returns updated data after the update operation
@@ -268,6 +271,19 @@ const linksController = {
       return response.status(500).json({
         message: "Internal server error",
       });
+    }
+  },
+  createUploadSignature: async (request, response)=>{
+    try {
+      const { signature, timestamp }  = generateUploadSignature();
+      response.json({
+        signature: signature,
+        timestamp: timestamp,
+        apiKey: process.env.CLOUDINARY_API_KEY,
+        cloudName: process.env.CLOUDINARY_NAME
+      });
+    } catch (error) {
+      response.status(500).json({ message:'Internal server error' });
     }
   },
 };
